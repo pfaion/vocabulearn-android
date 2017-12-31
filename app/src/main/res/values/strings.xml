@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Vocabulearn</string>
+    <string name="title_study">Study</string>
+    <string name="title_folders">Folders</string>
+    <string name="title_smart_sets">Smart Sets</string>
+</resources>

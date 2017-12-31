@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_study"
+        android:icon="@drawable/ic_trending_up_black_24dp"
+        android:title="@string/title_study" />
+
+    <item
+        android:id="@+id/navigation_folders"
+        android:icon="@drawable/ic_folder_open_black_24dp"
+        android:title="@string/title_folders" />
+
+    <item
+        android:id="@+id/navigation_smart_sets"
+        android:icon="@drawable/ic_folder_special_black_24dp"
+        android:title="@string/title_smart_sets" />
+
+</menu>
