@@ -3,4 +3,7 @@
     <string name="title_study">Study</string>
     <string name="title_folders">Folders</string>
     <string name="title_smart_sets">Smart Sets</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

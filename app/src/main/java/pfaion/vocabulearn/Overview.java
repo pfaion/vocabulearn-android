@@ -1,33 +1,43 @@
 package pfaion.vocabulearn;
 
+import android.app.FragmentTransaction;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
-public class Overview extends AppCompatActivity {
 
-    private TextView mTextMessage;
+public class Overview extends AppCompatActivity
+implements FolderFragment.OnListFragmentInteractionListener {
+
+    private FrameLayout frameLayout;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_study:
-                    mTextMessage.setText(R.string.title_study);
-                    return true;
+                    selectedFragment = FolderFragment.newInstance();
+                    break;
                 case R.id.navigation_folders:
-                    mTextMessage.setText(R.string.title_folders);
-                    return true;
+                    selectedFragment = FolderFragment.newInstance();
+                    break;
                 case R.id.navigation_smart_sets:
-                    mTextMessage.setText(R.string.title_smart_sets);
-                    return true;
+                    selectedFragment = FolderFragment.newInstance();
+                    break;
             }
-            return false;
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.frame_layout, selectedFragment);
+            transaction.commit();
+            return true;
         }
 
     };
@@ -37,9 +47,25 @@ public class Overview extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_overview);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
+        frameLayout = (FrameLayout) findViewById(R.id.frame_layout);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+//        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.frame_layout, FolderFragment.newInstance());
+        transaction.commit();
     }
 
+
+    @Override
+    public void onListFragmentInteraction(int id) {
+        Log.d("VOCABULEARN", "Clicked ID: " + id);
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
+        transaction.replace(R.id.frame_layout, SetFragment.newInstance(id));
+        transaction.addToBackStack("go to folder");
+        transaction.commit();
+
+    }
 }
