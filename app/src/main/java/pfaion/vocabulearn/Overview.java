@@ -11,11 +11,17 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.facebook.stetho.Stetho;
+
+import pfaion.vocabulearn.database.Data;
+
 
 public class Overview extends AppCompatActivity
 implements FolderFragment.OnListFragmentInteractionListener {
 
     private FrameLayout frameLayout;
+
+    private Data db;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -45,6 +51,10 @@ implements FolderFragment.OnListFragmentInteractionListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Stetho.initializeWithDefaults(this);
+        db = Data.getInstance(this);
+        db.load();
+
         setContentView(R.layout.activity_overview);
 
         frameLayout = (FrameLayout) findViewById(R.id.frame_layout);
@@ -68,4 +78,5 @@ implements FolderFragment.OnListFragmentInteractionListener {
         transaction.commit();
 
     }
+
 }
