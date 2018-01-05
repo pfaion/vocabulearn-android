@@ -1,0 +1,145 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="Amount"
+        android:textAlignment="center"
+        android:textColor="@color/primaryLightColor"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_amount_5"
+            android:checked="true"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_amount_5"/>
+
+        <RadioButton
+            android:id="@+id/rb_amount_10"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_amount_10"/>
+
+        <RadioButton
+            android:id="@+id/rb_amount_20"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_amount_20"/>
+
+        <RadioButton
+            android:id="@+id/rb_amount_30"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_amount_30"/>
+
+        <RadioButton
+            android:id="@+id/rb_amount_all"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_amount_all"/>
+
+
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_weight="1"
+        android:text="Side"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/primaryLightColor"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_side_front"
+            android:checked="true"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_side_front"/>
+
+        <RadioButton
+            android:id="@+id/rb_side_back"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_side_back"/>
+
+        <RadioButton
+            android:id="@+id/rb_side_mixed"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_side_mixed"/>
+
+    </RadioGroup>
+
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_weight="1"
+        android:text="Order"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:textColor="@color/primaryLightColor"
+        android:textSize="18sp" />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rb_order_order"
+            android:checked="true"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_order_order"/>
+
+        <RadioButton
+            android:id="@+id/rb_order_random"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_order_random"/>
+
+        <RadioButton
+            android:id="@+id/rb_order_hard"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_order_hard"/>
+
+        <RadioButton
+            android:id="@+id/rb_order_old"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_order_old"/>
+
+        <RadioButton
+            android:id="@+id/rb_order_new"
+            style="@style/radio_button"
+            android:layout_weight="1"
+            android:text="@string/rb_order_new"/>
+
+
+    </RadioGroup>
+
+</LinearLayout>

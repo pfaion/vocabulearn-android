@@ -7,4 +7,17 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="refresh">Refresh</string>
+    <string name="rb_amount_5">5</string>
+    <string name="rb_amount_10">10</string>
+    <string name="rb_amount_20">20</string>
+    <string name="rb_amount_30">30</string>
+    <string name="rb_amount_all">All</string>
+    <string name="rb_side_front">Front First</string>
+    <string name="rb_side_back">Back First</string>
+    <string name="rb_side_mixed">Mixed</string>
+    <string name="rb_order_order">Order</string>
+    <string name="rb_order_random">Random</string>
+    <string name="rb_order_hard">Hard</string>
+    <string name="rb_order_old">Old</string>
+    <string name="rb_order_new">New</string>
 </resources>

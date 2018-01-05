@@ -117,6 +117,9 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 
     @Override
     public void onSetClick(int id) {
+
         Log.d(TAG, "Clicked Set: " + id);
+        SettingsDialogFragment dialog = new SettingsDialogFragment();
+        dialog.show(getFragmentManager(), "SettingsDialog");
     }
 }
