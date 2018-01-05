@@ -13,6 +13,9 @@ public interface FlashcardDao {
     @Query("SELECT * FROM Flashcard")
     public Flashcard[] getAllCards();
 
+    @Query("SELECT * FROM Flashcard WHERE card_set=:setID")
+    public Flashcard[] getFlashcardsForSet(int setID);
+
     @Query("DELETE FROM Flashcard")
     public void nuke();
 

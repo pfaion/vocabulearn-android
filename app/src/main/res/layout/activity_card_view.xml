@@ -8,7 +8,7 @@
     tools:context="pfaion.vocabulearn.CardViewActivity">
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/cardViewTitle"
         style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
         android:layout_width="0dp"
         android:layout_height="56dp"
@@ -21,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
-        android:id="@+id/progressBar"
+        android:id="@+id/cardViewProgress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
         android:progressTint="@color/primaryLightColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintTop_toBottomOf="@+id/cardViewTitle" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -42,7 +42,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <ImageButton
-            android:id="@+id/imageButton3"
+            android:id="@+id/button_prev"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -51,7 +51,7 @@
             app:srcCompat="@drawable/arrow_back" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/button_wrong"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -60,7 +60,7 @@
             app:srcCompat="@drawable/thumb_down" />
 
         <ImageButton
-            android:id="@+id/imageButton5"
+            android:id="@+id/button_flip"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -69,7 +69,7 @@
             app:srcCompat="@drawable/sync" />
 
         <ImageButton
-            android:id="@+id/imageButton6"
+            android:id="@+id/button_correct"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -78,7 +78,7 @@
             app:srcCompat="@drawable/thumb_up" />
 
         <ImageButton
-            android:id="@+id/imageButton7"
+            android:id="@+id/button_next"
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:layout_weight="1"
@@ -94,7 +94,7 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressBar">
+        app:layout_constraintTop_toBottomOf="@+id/cardViewProgress">
 
     </FrameLayout>
 

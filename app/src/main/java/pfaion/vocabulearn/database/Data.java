@@ -73,6 +73,23 @@ public abstract class Data extends RoomDatabase {
     }
 
 
+    public void getCardsForSet(int setID, LoadedCb<Flashcard[]> cb) { new GetCardsForSetTask(setID, cb).execute(); }
+    private static class GetCardsForSetTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<Flashcard[]> cb;
+        private int setID;
+        GetCardsForSetTask(int setID, LoadedCb<Flashcard[]> cb) { this.cb = cb; this.setID = setID; }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Flashcard[] cards = sInstance.flashcardDao().getFlashcardsForSet(setID);
+            cb.onSuccess(cards);
+            return null;
+        }
+    }
+
+
+
     public void getSets(int folderID, LoadedCb<CardSet[]> cb) {
         new GetSetsTask(folderID, cb).execute();
     }

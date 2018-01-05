@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import com.facebook.stetho.Stetho;
 
 import pfaion.vocabulearn.database.Data;
+import pfaion.vocabulearn.database.Flashcard;
 
 
 public class Overview extends AppCompatActivity
@@ -93,16 +94,16 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Context context = this;
-        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "start clicked");
-                Intent intent = new Intent(context, CardViewActivity.class);
-                startActivity(intent);
-            }
-        });
-        dialog.show(getFragmentManager(), "SettingsDialog");
+//        final Context context = this;
+//        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Log.d(TAG, "start clicked");
+//                Intent intent = new Intent(context, CardViewActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//        dialog.show(getFragmentManager(), "SettingsDialog");
 
         Stetho.initializeWithDefaults(this);
         db = Data.getInstance(this);
@@ -134,18 +135,27 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     @Override
     public void onSetClick(int id) {
         Log.d(TAG, "Clicked Set: " + id);
-
-
         final Context context = this;
-        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+
+        db.getCardsForSet(id, new Data.LoadedCb<Flashcard[]>() {
             @Override
-            public void onClick(View view) {
-                Log.d(TAG, "start clicked");
-                Intent intent = new Intent(context, CardViewActivity.class);
-                startActivity(intent);
+            public void onSuccess(final Flashcard[] data) {
+                SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.d(TAG, "start clicked");
+                        Intent intent = new Intent(context, CardViewActivity.class);
+                        intent.putExtra("cards", data);
+                        startActivity(intent);
+                    }
+                });
+                dialog.show(getFragmentManager(), "SettingsDialog");
             }
         });
-        dialog.show(getFragmentManager(), "SettingsDialog");
+
+
+
+
     }
 
 
