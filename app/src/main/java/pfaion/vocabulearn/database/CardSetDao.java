@@ -13,6 +13,9 @@ public interface CardSetDao {
     @Query("SELECT * FROM CardSet")
     public CardSet[] getAllSets();
 
+    @Query("SELECT * FROM CardSet WHERE folder=:folderID")
+    public CardSet[] getSetsForFolder(int folderID);
+
     @Query("DELETE FROM CardSet")
     public void nuke();
 

@@ -3,7 +3,6 @@ package pfaion.vocabulearn;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,21 +14,21 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
+import pfaion.vocabulearn.database.Data;
+import pfaion.vocabulearn.database.Folder;
 
 
 public class FolderFragment extends Fragment {
+    private static final String TAG = "Vocabulearn.FolderFragment";
 
-    private OnListFragmentInteractionListener mListener;
+    private OnFolderClickListener mListener;
 
 
     public FolderFragment() {}
@@ -39,50 +38,24 @@ public class FolderFragment extends Fragment {
         return fragment;
     }
 
-
-    private JSONArray array;
-    private MyFolderRecyclerViewAdapter adapter;
+    private Data db;
+    private Folder[] array;
+    private FolderRecyclerViewAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        array = new JSONArray();
-        adapter = new MyFolderRecyclerViewAdapter(array, mListener);
+        array = new Folder[0];
+        adapter = new FolderRecyclerViewAdapter(array, mListener);
+        db = Data.getInstance(getContext());
 
-
-        final String TAG = "VOCABULEARN";
-
-        RequestQueue queue = Volley.newRequestQueue(this.getContext());
-        String url ="https://vocabulearn.herokuapp.com/API/folders/";
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray newData = response.getJSONArray("folders");
-//                            for (int i = 0; i < newData.length(); i++) {
-//                                array.put(newData.get(i));
-//                            }
-                            adapter.setArray(newData);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        };
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "Error.");
-                    }
-                }
-        );
-        queue.add(request);
+        db.getAllFolders(new Data.LoadedCb<Folder[]>() {
+            @Override
+            public void onSuccess(Folder[] data) {
+                adapter.setArray(data);
+            }
+        });
 
     }
 
@@ -105,8 +78,8 @@ public class FolderFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnFolderClickListener) {
+            mListener = (OnFolderClickListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -120,8 +93,8 @@ public class FolderFragment extends Fragment {
     }
 
 
-    public interface OnListFragmentInteractionListener {
+    public interface OnFolderClickListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(int id);
+        void onFolderClick(int id);
     }
 }

@@ -1,6 +1,5 @@
 package pfaion.vocabulearn;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -22,13 +21,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pfaion.vocabulearn.database.CardSet;
+import pfaion.vocabulearn.database.Data;
+import pfaion.vocabulearn.database.Folder;
+
 
 public class SetFragment extends Fragment {
+    private static final String TAG = "Vocabulearn.SetFragment";
 
-
+    private OnSetClickListener mListener;
     private int folderID;
-    private JSONArray array;
-    private MyFolderRecyclerViewAdapter adapter;
 
     public SetFragment() {}
 
@@ -41,89 +43,53 @@ public class SetFragment extends Fragment {
         return fragment;
     }
 
+    private Data db;
+    private CardSet[] array;
+    private SetRecyclerViewAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        array = new JSONArray();
-        adapter = new MyFolderRecyclerViewAdapter(array, mListener);
-
 
         Bundle arguments = getArguments();
         if (arguments != null) {
             folderID = arguments.getInt("id");
         }
 
-        final String TAG = "VOCABULEARN";
+        array = new CardSet[0];
+        adapter = new SetRecyclerViewAdapter(array, mListener);
+        db = Data.getInstance(getContext());
 
-        RequestQueue queue = Volley.newRequestQueue(this.getContext());
-        String url ="https://vocabulearn.herokuapp.com/API/sets/" + folderID + "/";
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                url,
-                null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray newData = response.getJSONArray("sets");
-//                            for (int i = 0; i < newData.length(); i++) {
-//                                array.put(newData.get(i));
-//                            }
-                            adapter.setArray(newData);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        };
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "Error.");
-                    }
-                }
-        );
-        queue.add(request);
+        db.getSets(folderID, new Data.LoadedCb<CardSet[]>() {
+            @Override
+            public void onSuccess(CardSet[] data) {
+                adapter.setArray(data);
+            }
+        });
 
     }
-
-
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_set, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_folder_list, container, false);
 
-
-
-        Context context = view.getContext();
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        recyclerView.setAdapter(adapter);
-
+        // Set the adapter
+        if (view instanceof RecyclerView) {
+            Context context = view.getContext();
+            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(adapter);
+        }
         return view;
-
-
-
     }
 
-
-
-
-    // interaction stuff
-
-//    public interface OnListFragmentInteractionListener {
-//        void onListFragmentInteraction(int id);
-//    }
-    private FolderFragment.OnListFragmentInteractionListener mListener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof FolderFragment.OnListFragmentInteractionListener) {
-            mListener = (FolderFragment.OnListFragmentInteractionListener) context;
+        if (context instanceof OnSetClickListener) {
+            mListener = (OnSetClickListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
@@ -134,5 +100,11 @@ public class SetFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+
+    public interface OnSetClickListener {
+        // TODO: Update argument type and name
+        void onSetClick(int id);
     }
 }

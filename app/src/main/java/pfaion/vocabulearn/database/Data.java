@@ -50,24 +50,57 @@ public abstract class Data extends RoomDatabase {
         return sInstance;
     }
 
-    public interface DataLoadedCb {
-        public void onSuccess();
+
+    public interface LoadedCb<T> {
+        public void onSuccess(T data);
     }
-    public void load(DataLoadedCb cb) { new LoadAllDataTask(cb).execute(); }
 
-    public void load() { load(new DataLoadedCb() {
+    public void getAllFolders(LoadedCb<Folder[]> cb) {
+        new GetFoldersTask(cb).execute();
+    }
+
+    private static class GetFoldersTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<Folder[]> cb;
+        GetFoldersTask(LoadedCb<Folder[]> cb) { this.cb = cb; }
+
         @Override
-        public void onSuccess() {}
-    }); }
+        protected Void doInBackground(Void... params) {
+            Folder[] folders = sInstance.folderDao().getAllFolders();
+            cb.onSuccess(folders);
+            return null;
+        }
+    }
 
 
+    public void getSets(int folderID, LoadedCb<CardSet[]> cb) {
+        new GetSetsTask(folderID, cb).execute();
+    }
+
+    private static class GetSetsTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<CardSet[]> cb;
+        private int folderID;
+        GetSetsTask(int folderID, LoadedCb<CardSet[]> cb) { this.cb = cb; this.folderID = folderID; }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            CardSet[] sets = sInstance.cardSetDao().getSetsForFolder(folderID);
+            cb.onSuccess(sets);
+            return null;
+        }
+    }
+
+
+
+
+
+    public void load(LoadedCb<Void> cb) { new LoadAllDataTask(cb).execute(); }
 
     private static class LoadAllDataTask extends AsyncTask<Void, Void, Void> {
 
-        private DataLoadedCb cb;
-        LoadAllDataTask(DataLoadedCb cb) {
-            this.cb = cb;
-        }
+        private LoadedCb<Void> cb;
+        LoadAllDataTask(LoadedCb<Void> cb) { this.cb = cb; }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -121,7 +154,7 @@ public abstract class Data extends RoomDatabase {
                 sInstance.flashcardDao().insert(cards);
                 Log.d(TAG, "Data refresh successful!");
 
-                cb.onSuccess();
+                cb.onSuccess(null);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -10,7 +10,7 @@ public interface FolderDao {
     @Insert
     public void insert(Folder... folders);
 
-    @Query("SELECT * FROM Folder")
+    @Query("SELECT * FROM Folder ORDER BY name")
     public Folder[] getAllFolders();
 
     @Query("DELETE FROM Folder")

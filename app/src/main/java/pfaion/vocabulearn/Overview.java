@@ -20,7 +20,8 @@ import pfaion.vocabulearn.database.Data;
 
 
 public class Overview extends AppCompatActivity
-implements FolderFragment.OnListFragmentInteractionListener {
+implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener {
+    private static final String TAG = "Vocabulearn.Overview";
 
     private FrameLayout frameLayout;
 
@@ -66,9 +67,9 @@ implements FolderFragment.OnListFragmentInteractionListener {
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                db.load(new Data.DataLoadedCb() {
+                db.load(new Data.LoadedCb<Void>() {
                     @Override
-                    public void onSuccess() {
+                    public void onSuccess(Void data) {
                         FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         transaction.replace(R.id.frame_layout, FolderFragment.newInstance());
                         transaction.commit();
@@ -89,7 +90,6 @@ implements FolderFragment.OnListFragmentInteractionListener {
 
         Stetho.initializeWithDefaults(this);
         db = Data.getInstance(this);
-        db.load();
 
         setContentView(R.layout.activity_overview);
 
@@ -104,8 +104,8 @@ implements FolderFragment.OnListFragmentInteractionListener {
 
 
     @Override
-    public void onListFragmentInteraction(int id) {
-        Log.d("VOCABULEARN", "Clicked ID: " + id);
+    public void onFolderClick(int id) {
+        Log.d(TAG, "Clicked ID: " + id);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
@@ -115,4 +115,8 @@ implements FolderFragment.OnListFragmentInteractionListener {
 
     }
 
+    @Override
+    public void onSetClick(int id) {
+        Log.d(TAG, "Clicked Set: " + id);
+    }
 }
