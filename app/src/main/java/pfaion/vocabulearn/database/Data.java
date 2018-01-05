@@ -50,78 +50,82 @@ public abstract class Data extends RoomDatabase {
         return sInstance;
     }
 
-    public void load() {
-        new LoadAllDataTask().execute();
+    public interface DataLoadedCb {
+        public void onSuccess();
     }
+    public void load(DataLoadedCb cb) { new LoadAllDataTask(cb).execute(); }
+
+    public void load() { load(new DataLoadedCb() {
+        @Override
+        public void onSuccess() {}
+    }); }
+
+
 
     private static class LoadAllDataTask extends AsyncTask<Void, Void, Void> {
 
+        private DataLoadedCb cb;
+        LoadAllDataTask(DataLoadedCb cb) {
+            this.cb = cb;
+        }
+
         @Override
         protected Void doInBackground(Void... params) {
-            loadFolders();
-            loadSets();
-            loadCards();
-            return null;
-        }
 
-        private void loadFolders() {
             try {
-                String foldersUrl ="https://vocabulearn.herokuapp.com/API/folders/";
-                Request request = new Request.Builder().url(foldersUrl).build();
-                Response response = okHttp.newCall(request).execute();
+                String url, r;
+                Request request;
+                Response response;
+                int start, end;
 
-                String r = response.body().string();
-                int start = 12;
-                int end = r.length() - 1;
-                r = r.substring(start, end);
                 Gson gson = new Gson();
+
+                url ="https://vocabulearn.herokuapp.com/API/folders/";
+                request = new Request.Builder().url(url).build();
+                response = okHttp.newCall(request).execute();
+
+                r = response.body().string();
+                start = 12;
+                end = r.length() - 1;
+                r = r.substring(start, end);
                 Folder[] folders = gson.fromJson(r, Folder[].class);
+                if(folders.length == 0) throw new RuntimeException("Got empty folder list");
 
-                sInstance.folderDao().nuke();
-                sInstance.folderDao().insert(folders);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                url ="https://vocabulearn.herokuapp.com/API/sets/";
+                request = new Request.Builder().url(url).build();
+                response = okHttp.newCall(request).execute();
 
-        private void loadSets() {
-            try {
-                String foldersUrl ="https://vocabulearn.herokuapp.com/API/sets/";
-                Request request = new Request.Builder().url(foldersUrl).build();
-                Response response = okHttp.newCall(request).execute();
-
-                String r = response.body().string();
-                int start = 9;
-                int end = r.length() - 1;
+                r = response.body().string();
+                start = 9;
+                end = r.length() - 1;
                 r = r.substring(start, end);
-                Gson gson = new Gson();
                 CardSet[] sets = gson.fromJson(r, CardSet[].class);
+                if(sets.length == 0) throw new RuntimeException("Got empty sets list");
 
-                sInstance.cardSetDao().nuke();
-                sInstance.cardSetDao().insert(sets);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                url ="https://vocabulearn.herokuapp.com/API/cards/";
+                request = new Request.Builder().url(url).build();
+                response = okHttp.newCall(request).execute();
 
-        private void loadCards() {
-            try {
-                String foldersUrl ="https://vocabulearn.herokuapp.com/API/cards/";
-                Request request = new Request.Builder().url(foldersUrl).build();
-                Response response = okHttp.newCall(request).execute();
-
-                String r = response.body().string();
-                int start = 10;
-                int end = r.length() - 1;
+                r = response.body().string();
+                start = 10;
+                end = r.length() - 1;
                 r = r.substring(start, end);
-                Gson gson = new Gson();
                 Flashcard[] cards = gson.fromJson(r, Flashcard[].class);
+                if(cards.length == 0) throw new RuntimeException("Got empty cards list");
 
                 sInstance.flashcardDao().nuke();
+                sInstance.cardSetDao().nuke();
+                sInstance.folderDao().nuke();
+                sInstance.folderDao().insert(folders);
+                sInstance.cardSetDao().insert(sets);
                 sInstance.flashcardDao().insert(cards);
+                Log.d(TAG, "Data refresh successful!");
+
+                cb.onSuccess();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return null;
         }
     }
 
