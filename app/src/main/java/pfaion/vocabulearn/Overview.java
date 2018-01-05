@@ -1,6 +1,8 @@
 package pfaion.vocabulearn;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.facebook.stetho.Stetho;
@@ -21,7 +26,7 @@ import pfaion.vocabulearn.database.Data;
 
 public class Overview extends AppCompatActivity
 implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener {
-    private static final String TAG = "Vocabulearn.Overview";
+    public static final String TAG = "Vocabulearn";
 
     private FrameLayout frameLayout;
 
@@ -88,6 +93,17 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final Context context = this;
+        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "start clicked");
+                Intent intent = new Intent(context, CardViewActivity.class);
+                startActivity(intent);
+            }
+        });
+        dialog.show(getFragmentManager(), "SettingsDialog");
+
         Stetho.initializeWithDefaults(this);
         db = Data.getInstance(this);
 
@@ -117,9 +133,21 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 
     @Override
     public void onSetClick(int id) {
-
         Log.d(TAG, "Clicked Set: " + id);
-        SettingsDialogFragment dialog = new SettingsDialogFragment();
+
+
+        final Context context = this;
+        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "start clicked");
+                Intent intent = new Intent(context, CardViewActivity.class);
+                startActivity(intent);
+            }
+        });
         dialog.show(getFragmentManager(), "SettingsDialog");
     }
+
+
+
 }

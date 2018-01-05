@@ -20,4 +20,10 @@
     <string name="rb_order_hard">Hard</string>
     <string name="rb_order_old">Old</string>
     <string name="rb_order_new">New</string>
+
+    <string name="title_activity_card_view">CardViewActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="cancel">Cancel</string>
+    <string name="start">Start</string>
 </resources>
