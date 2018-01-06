@@ -1,20 +1,29 @@
 package pfaion.vocabulearn;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.github.pwittchen.swipe.library.rx2.Swipe;
+import com.github.pwittchen.swipe.library.rx2.SwipeListener;
+
 
 public class CardFragment extends Fragment {
+    public static final String TAG = "Vocabulearn";
 
     private String text;
 
     private OnFragmentInteractionListener mListener;
+
+    private Swipe swipe;
 
     public CardFragment() {
     }
@@ -35,21 +44,63 @@ public class CardFragment extends Fragment {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_card, container, false);
+
         TextView textView = view.findViewById(R.id.textView5);
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mListener.onFragmentInteraction();
+        textView.setText(text);
+
+
+        swipe = new Swipe();
+        swipe.setListener(new SwipeListener() {
+            @Override public void onSwipingLeft(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedLeft(final MotionEvent event) {
+                mListener.onSwipeLeft();
+            }
+
+            @Override public void onSwipingRight(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedRight(final MotionEvent event) {
+                mListener.onSwipeRight();
+            }
+
+            @Override public void onSwipingUp(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedUp(final MotionEvent event) {
+            }
+
+            @Override public void onSwipingDown(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedDown(final MotionEvent event) {
             }
         });
-        textView.setText(text);
+
+
+
+
+
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                swipe.dispatchTouchEvent(motionEvent);
+                return true;
+            }
+        });
+
+
         return view;
     }
+
+
 
 
     @Override
@@ -71,6 +122,7 @@ public class CardFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction();
+        void onSwipeLeft();
+        void onSwipeRight();
     }
 }

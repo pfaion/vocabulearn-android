@@ -2,32 +2,39 @@ package pfaion.vocabulearn;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.github.pwittchen.swipe.library.rx2.Swipe;
-import com.github.pwittchen.swipe.library.rx2.SwipeListener;
 
 import pfaion.vocabulearn.database.Flashcard;
 
 public class CardViewActivity extends AppCompatActivity
 implements CardFragment.OnFragmentInteractionListener{
     public static final String TAG = "Vocabulearn";
-    private Swipe swipe;
+
+    private static enum Result {
+        NOT_ANSWERED,
+        WRONG,
+        CORRECT,
+    }
+
 
     private Flashcard[] cards;
+    private boolean[] frontFirst;
+    private boolean[] front;
+    private boolean[] turnedBefore;
+    private Result[] results;
     private int i;
-    private boolean front;
 
-    private boolean frontDefault = true;
 
     private String currentText() {
-        if(front) {
+        if(front[i]) {
             return cards[i].front;
         } else {
             return cards[i].back;
@@ -35,67 +42,91 @@ implements CardFragment.OnFragmentInteractionListener{
     }
 
 
+    private ImageButton buttonWrong;
+    private ImageButton buttonFlip;
+    private ImageButton buttonCorrect;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_view);
 
+        buttonWrong = findViewById(R.id.button_wrong);
+        buttonFlip = findViewById(R.id.button_flip);
+        buttonCorrect = findViewById(R.id.button_correct);
+
+        buttonWrong.setVisibility(View.INVISIBLE);
+        buttonCorrect.setVisibility(View.INVISIBLE);
+
         Intent intent = getIntent();
         if(intent.hasExtra("cards")) {
             cards = (Flashcard[]) intent.getSerializableExtra("cards");
+            frontFirst = new boolean[cards.length];
+            front = new boolean[cards.length];
+            turnedBefore = new boolean[cards.length];
+            results = new Result[cards.length];
             i = 0;
-            front = true;
+            for(int j = 0; j < cards.length; ++j) {
+                frontFirst[j] = true;
+                front[j] = frontFirst[j];
+                turnedBefore[j] = false;
+                results[j] = Result.NOT_ANSWERED;
+            }
             showSlideLeft();
-            updateProgress();
+            updateUI();
         }
 
-//        findViewById(R.id.button_prev).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                prevCard();
-//            }
-//        });
 
-        findViewById(R.id.button_flip).setOnClickListener(new View.OnClickListener() {
+
+
+        final GestureDetector flipButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onSingleTapConfirmed(MotionEvent e) {
                 flipCard();
+                return true;
+            }
+        });
+        buttonFlip.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                flipButtonGestureDetector.onTouchEvent(motionEvent);
+                return true;
             }
         });
 
-//        findViewById(R.id.button_next).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                nextCard();
-//            }
-//        });
-
-        swipe = new Swipe();
-        swipe.setListener(new SwipeListener() {
-            @Override public void onSwipingLeft(final MotionEvent event) {
+        final GestureDetector wrongButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                Result prevResult = results[i];
+                results[i] = Result.WRONG;
+                updateUI();
+                if(prevResult == Result.NOT_ANSWERED) nextCard();
+                return true;
             }
-
-            @Override public void onSwipedLeft(final MotionEvent event) {
-                nextCard();
+        });
+        buttonWrong.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                wrongButtonGestureDetector.onTouchEvent(motionEvent);
+                return true;
             }
+        });
 
-            @Override public void onSwipingRight(final MotionEvent event) {
+        final GestureDetector correctButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                Result prevResult = results[i];
+                results[i] = Result.CORRECT;
+                updateUI();
+                if(prevResult == Result.NOT_ANSWERED) nextCard();
+                return true;
             }
-
-            @Override public void onSwipedRight(final MotionEvent event) {
-                prevCard();
-            }
-
-            @Override public void onSwipingUp(final MotionEvent event) {
-            }
-
-            @Override public void onSwipedUp(final MotionEvent event) {
-            }
-
-            @Override public void onSwipingDown(final MotionEvent event) {
-            }
-
-            @Override public void onSwipedDown(final MotionEvent event) {
+        });
+        buttonCorrect.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                correctButtonGestureDetector.onTouchEvent(motionEvent);
+                return true;
             }
         });
 
@@ -103,38 +134,53 @@ implements CardFragment.OnFragmentInteractionListener{
 
     }
 
-    @Override public boolean dispatchTouchEvent(MotionEvent event) {
-        swipe.dispatchTouchEvent(event);
-        return super.dispatchTouchEvent(event);
-    }
 
-    private void updateProgress() {
+
+
+    private void updateUI() {
         ((TextView)findViewById(R.id.cardViewTitle)).setText("Card Set " + (i+1) + "/" + cards.length);
         int progress = Math.round(100f/cards.length*(i+1));
         ((ProgressBar)findViewById(R.id.cardViewProgress)).setProgress(progress);
+        switch (results[i]) {
+            case NOT_ANSWERED:
+                buttonWrong.setColorFilter(Color.WHITE);
+                buttonCorrect.setColorFilter(Color.WHITE);
+                break;
+            case WRONG:
+                buttonWrong.setColorFilter(Color.RED);
+                buttonCorrect.setColorFilter(Color.WHITE);
+                break;
+            case CORRECT:
+                buttonWrong.setColorFilter(Color.WHITE);
+                buttonCorrect.setColorFilter(Color.GREEN);
+                break;
+        }
     }
 
     private void nextCard() {
         if(i < cards.length - 1) {
             i++;
-            front = frontDefault;
             showSlideLeft();
-            updateProgress();
+            updateUI();
         }
     }
 
     private void prevCard() {
         if(i > 0) {
             i--;
-            front = !frontDefault;
             showSlideRight();
-            updateProgress();
+            updateUI();
         }
     }
 
 
     private void flipCard() {
-        front = !front;
+        front[i] = !front[i];
+        if(!turnedBefore[i]) {
+            buttonWrong.setVisibility(View.VISIBLE);
+            buttonCorrect.setVisibility(View.VISIBLE);
+            turnedBefore[i] = true;
+        }
         showFlip();
     }
 
@@ -183,7 +229,12 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
     @Override
-    public void onFragmentInteraction() {
+    public void onSwipeLeft() {
+        nextCard();
+    }
 
+    @Override
+    public void onSwipeRight() {
+        prevCard();
     }
 }
