@@ -1,6 +1,7 @@
 package pfaion.vocabulearn;
 
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -20,11 +21,14 @@ import com.github.mikephil.charting.data.PieEntry;
 import java.util.ArrayList;
 import java.util.List;
 
+import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
 
 public class CardViewActivity extends AppCompatActivity
 implements CardFragment.OnFragmentInteractionListener{
     public static final String TAG = "Vocabulearn";
+
+    private Data db;
 
     public static enum Result {
         NOT_ANSWERED,
@@ -58,6 +62,8 @@ implements CardFragment.OnFragmentInteractionListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_view);
+
+        db = Data.getInstance(this);
 
         buttonWrong = findViewById(R.id.button_wrong);
         buttonFlip = findViewById(R.id.button_flip);
@@ -176,15 +182,56 @@ implements CardFragment.OnFragmentInteractionListener{
             showSlideLeft();
             updateUI();
         } else {
-            ResultsDialogFragment dialog = ResultsDialogFragment.newInstance(results, new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                }
-            });
-            dialog.show(getFragmentManager(), "ResultsDialog");
-
+            endAndShowResults();
         }
     }
+
+
+    private void endAndShowResults() {
+        final Context context = this;
+        ResultsDialogFragment dialog = ResultsDialogFragment.newInstance(results, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                commitResults();
+
+            }
+        });
+        dialog.show(getFragmentManager(), "ResultsDialog");
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        endAndShowResults();
+    }
+
+
+    private void commitResults() {
+        for(int i = 0; i < cards.length; ++i) {
+            String history = cards[i].history;
+            switch (results[i]) {
+                case CORRECT:
+                    history = "1" + history;
+                    break;
+                case WRONG:
+                    history = "0" + history;
+                    break;
+                default: break;
+            }
+            if(history.length() > 10) {
+                history = history.substring(0, 10);
+            }
+            cards[i].history = history;
+        }
+        db.updateCards(cards, new Data.LoadedCb<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                finish();
+            }
+        });
+    }
+
 
     private void prevCard() {
         if(i > 0) {

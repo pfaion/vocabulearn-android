@@ -3,6 +3,7 @@ package pfaion.vocabulearn.database;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 @Dao
 public interface FlashcardDao {
@@ -18,5 +19,8 @@ public interface FlashcardDao {
 
     @Query("DELETE FROM Flashcard")
     public void nuke();
+
+    @Update
+    public void updateCards(Flashcard... cards);
 
 }
