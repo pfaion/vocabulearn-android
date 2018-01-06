@@ -41,19 +41,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageButton
-            android:id="@+id/button_prev"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:background="@color/primaryDarkColor"
-            android:tint="@android:color/white"
-            app:srcCompat="@drawable/arrow_back" />
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_prev"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="56dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@color/primaryDarkColor"-->
+            <!--android:tint="@android:color/white"-->
+            <!--app:srcCompat="@drawable/arrow_back" />-->
 
         <ImageButton
             android:id="@+id/button_wrong"
             android:layout_width="wrap_content"
-            android:layout_height="56dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:background="@color/primaryDarkColor"
             android:tint="@android:color/white"
@@ -62,7 +62,7 @@
         <ImageButton
             android:id="@+id/button_flip"
             android:layout_width="wrap_content"
-            android:layout_height="56dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:background="@color/primaryDarkColor"
             android:tint="@android:color/white"
@@ -71,20 +71,20 @@
         <ImageButton
             android:id="@+id/button_correct"
             android:layout_width="wrap_content"
-            android:layout_height="56dp"
+            android:layout_height="100dp"
             android:layout_weight="1"
             android:background="@color/primaryDarkColor"
             android:tint="@android:color/white"
             app:srcCompat="@drawable/thumb_up" />
 
-        <ImageButton
-            android:id="@+id/button_next"
-            android:layout_width="wrap_content"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:background="@color/primaryDarkColor"
-            android:tint="@android:color/white"
-            app:srcCompat="@drawable/arrow_forward" />
+        <!--<ImageButton-->
+            <!--android:id="@+id/button_next"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="56dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@color/primaryDarkColor"-->
+            <!--android:tint="@android:color/white"-->
+            <!--app:srcCompat="@drawable/arrow_forward" />-->
     </LinearLayout>
 
     <FrameLayout

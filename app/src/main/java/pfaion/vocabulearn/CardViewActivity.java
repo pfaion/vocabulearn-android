@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.github.pwittchen.swipe.library.rx2.Swipe;
+import com.github.pwittchen.swipe.library.rx2.SwipeListener;
 
 import pfaion.vocabulearn.database.Flashcard;
 
 public class CardViewActivity extends AppCompatActivity
 implements CardFragment.OnFragmentInteractionListener{
     public static final String TAG = "Vocabulearn";
+    private Swipe swipe;
 
     private Flashcard[] cards;
     private int i;
@@ -44,12 +49,12 @@ implements CardFragment.OnFragmentInteractionListener{
             updateProgress();
         }
 
-        findViewById(R.id.button_prev).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prevCard();
-            }
-        });
+//        findViewById(R.id.button_prev).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                prevCard();
+//            }
+//        });
 
         findViewById(R.id.button_flip).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,14 +63,49 @@ implements CardFragment.OnFragmentInteractionListener{
             }
         });
 
-        findViewById(R.id.button_next).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//        findViewById(R.id.button_next).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                nextCard();
+//            }
+//        });
+
+        swipe = new Swipe();
+        swipe.setListener(new SwipeListener() {
+            @Override public void onSwipingLeft(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedLeft(final MotionEvent event) {
                 nextCard();
+            }
+
+            @Override public void onSwipingRight(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedRight(final MotionEvent event) {
+                prevCard();
+            }
+
+            @Override public void onSwipingUp(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedUp(final MotionEvent event) {
+            }
+
+            @Override public void onSwipingDown(final MotionEvent event) {
+            }
+
+            @Override public void onSwipedDown(final MotionEvent event) {
             }
         });
 
 
+
+    }
+
+    @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        swipe.dispatchTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 
     private void updateProgress() {
@@ -144,6 +184,6 @@ implements CardFragment.OnFragmentInteractionListener{
 
     @Override
     public void onFragmentInteraction() {
-        flipCard();
+
     }
 }
