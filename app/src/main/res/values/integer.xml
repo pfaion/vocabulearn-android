@@ -2,4 +2,5 @@
 <resources>
     <integer name="card_flip_time_full">100</integer>
     <integer name="card_flip_time_half">50</integer>
+    <integer name="slide_time">100</integer>
 </resources>

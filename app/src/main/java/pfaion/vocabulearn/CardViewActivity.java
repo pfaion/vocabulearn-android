@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,13 +13,20 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import pfaion.vocabulearn.database.Flashcard;
 
 public class CardViewActivity extends AppCompatActivity
 implements CardFragment.OnFragmentInteractionListener{
     public static final String TAG = "Vocabulearn";
 
-    private static enum Result {
+    public static enum Result {
         NOT_ANSWERED,
         WRONG,
         CORRECT,
@@ -55,8 +63,6 @@ implements CardFragment.OnFragmentInteractionListener{
         buttonFlip = findViewById(R.id.button_flip);
         buttonCorrect = findViewById(R.id.button_correct);
 
-        buttonWrong.setVisibility(View.INVISIBLE);
-        buttonCorrect.setVisibility(View.INVISIBLE);
 
         Intent intent = getIntent();
         if(intent.hasExtra("cards")) {
@@ -155,6 +161,13 @@ implements CardFragment.OnFragmentInteractionListener{
                 buttonCorrect.setColorFilter(Color.GREEN);
                 break;
         }
+        if(turnedBefore[i] || frontFirst[i] != front[i]) {
+            buttonWrong.setVisibility(View.VISIBLE);
+            buttonCorrect.setVisibility(View.VISIBLE);
+        } else {
+            buttonWrong.setVisibility(View.INVISIBLE);
+            buttonCorrect.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void nextCard() {
@@ -162,6 +175,14 @@ implements CardFragment.OnFragmentInteractionListener{
             i++;
             showSlideLeft();
             updateUI();
+        } else {
+            ResultsDialogFragment dialog = ResultsDialogFragment.newInstance(results, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
+            dialog.show(getFragmentManager(), "ResultsDialog");
+
         }
     }
 
@@ -177,10 +198,9 @@ implements CardFragment.OnFragmentInteractionListener{
     private void flipCard() {
         front[i] = !front[i];
         if(!turnedBefore[i]) {
-            buttonWrong.setVisibility(View.VISIBLE);
-            buttonCorrect.setVisibility(View.VISIBLE);
             turnedBefore[i] = true;
         }
+        updateUI();
         showFlip();
     }
 
