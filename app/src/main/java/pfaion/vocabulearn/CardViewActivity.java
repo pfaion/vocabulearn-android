@@ -6,20 +6,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.widget.Toast;
 
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
@@ -30,7 +23,7 @@ implements CardFragment.OnFragmentInteractionListener{
 
     private Data db;
 
-    public static enum Result {
+    public static enum ResultType {
         NOT_ANSWERED,
         WRONG,
         CORRECT,
@@ -41,7 +34,7 @@ implements CardFragment.OnFragmentInteractionListener{
     private boolean[] frontFirst;
     private boolean[] front;
     private boolean[] turnedBefore;
-    private Result[] results;
+    private ResultType[] results;
     private int i;
 
 
@@ -76,13 +69,13 @@ implements CardFragment.OnFragmentInteractionListener{
             frontFirst = new boolean[cards.length];
             front = new boolean[cards.length];
             turnedBefore = new boolean[cards.length];
-            results = new Result[cards.length];
+            results = new ResultType[cards.length];
             i = 0;
             for(int j = 0; j < cards.length; ++j) {
                 frontFirst[j] = true;
                 front[j] = frontFirst[j];
                 turnedBefore[j] = false;
-                results[j] = Result.NOT_ANSWERED;
+                results[j] = ResultType.NOT_ANSWERED;
             }
             showSlideLeft();
             updateUI();
@@ -109,10 +102,10 @@ implements CardFragment.OnFragmentInteractionListener{
         final GestureDetector wrongButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                Result prevResult = results[i];
-                results[i] = Result.WRONG;
+                ResultType prevResult = results[i];
+                results[i] = ResultType.WRONG;
                 updateUI();
-                if(prevResult == Result.NOT_ANSWERED) nextCard();
+                if(prevResult == ResultType.NOT_ANSWERED) nextCard();
                 return true;
             }
         });
@@ -127,10 +120,10 @@ implements CardFragment.OnFragmentInteractionListener{
         final GestureDetector correctButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                Result prevResult = results[i];
-                results[i] = Result.CORRECT;
+                ResultType prevResult = results[i];
+                results[i] = ResultType.CORRECT;
                 updateUI();
-                if(prevResult == Result.NOT_ANSWERED) nextCard();
+                if(prevResult == ResultType.NOT_ANSWERED) nextCard();
                 return true;
             }
         });
@@ -224,9 +217,10 @@ implements CardFragment.OnFragmentInteractionListener{
             }
             cards[i].history = history;
         }
-        db.updateCards(cards, new Data.LoadedCb<Void>() {
+        db.updateCards(cards, results, new Data.LoadedCb<String>() {
             @Override
-            public void onSuccess(Void data) {
+            public void onSuccess(String data) {
+                Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
                 finish();
             }
         });

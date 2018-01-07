@@ -18,8 +18,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
+
+import java.util.List;
 
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
@@ -73,9 +76,18 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                db.load(new Data.LoadedCb<Void>() {
+                db.load(new Data.LoadedCb<List<String>>() {
                     @Override
-                    public void onSuccess(Void data) {
+                    public void onSuccess(List<String> data) {
+                        Context context = getApplicationContext();
+                        String msg = "";
+                        for(String s : data) {
+                            msg += s + "\n";
+                        }
+                        if(msg.length() > 0) {
+                            msg = msg.substring(0, msg.length() - 1);
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                        }
                         FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         transaction.replace(R.id.frame_layout, FolderFragment.newInstance());
                         transaction.commit();
@@ -93,17 +105,6 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        final Context context = this;
-//        SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Log.d(TAG, "start clicked");
-//                Intent intent = new Intent(context, CardViewActivity.class);
-//                startActivity(intent);
-//            }
-//        });
-//        dialog.show(getFragmentManager(), "SettingsDialog");
 
         Stetho.initializeWithDefaults(this);
         db = Data.getInstance(this);

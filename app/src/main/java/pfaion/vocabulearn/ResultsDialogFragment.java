@@ -3,17 +3,13 @@ package pfaion.vocabulearn;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -21,10 +17,7 @@ import com.github.mikephil.charting.data.PieEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-import pfaion.vocabulearn.database.Flashcard;
-import pfaion.vocabulearn.CardViewActivity.Result;
-
-import static pfaion.vocabulearn.Overview.TAG;
+import pfaion.vocabulearn.CardViewActivity.ResultType;
 
 public class ResultsDialogFragment extends DialogFragment {
 
@@ -35,7 +28,7 @@ public class ResultsDialogFragment extends DialogFragment {
     private View.OnClickListener cb;
     public ResultsDialogFragment() {}
 
-    public static ResultsDialogFragment newInstance(Result[] results, View.OnClickListener cb) {
+    public static ResultsDialogFragment newInstance(ResultType[] results, View.OnClickListener cb) {
         ResultsDialogFragment fragment = new ResultsDialogFragment();
         Bundle args = new Bundle();
         args.putSerializable("results", results);
@@ -57,7 +50,7 @@ public class ResultsDialogFragment extends DialogFragment {
         PieChart pieChart = view.findViewById(R.id.chart);
 
 
-        Result[] results = (Result[]) getArguments().getSerializable("results");
+        ResultType[] results = (ResultType[]) getArguments().getSerializable("results");
         int countCorrent = 0;
         int countWrong = 0;
         int countNotAnswered = 0;

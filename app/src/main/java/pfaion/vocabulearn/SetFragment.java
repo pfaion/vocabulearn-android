@@ -57,7 +57,7 @@ public class SetFragment extends Fragment {
         }
 
         array = new CardSet[0];
-        adapter = new SetRecyclerViewAdapter(array, mListener);
+        adapter = new SetRecyclerViewAdapter(array, mListener, getContext());
         db = Data.getInstance(getContext());
 
         db.getSets(folderID, new Data.LoadedCb<CardSet[]>() {
