@@ -75,19 +75,31 @@ public class ResultsDialogFragment extends DialogFragment {
             }
         }
 
-
-        List<PieEntry> entries = new ArrayList<>();
-
-        entries.add(new PieEntry(countCorrent, "Correct"));
-        entries.add(new PieEntry(countWrong, "Wrong"));
-        entries.add(new PieEntry(countNotAnswered, "Not Answered"));
-
         int colorCorrect = Color.parseColor("#2ca02c");
         int colorWrong = Color.parseColor("#d62728");
         int colorNotAnswered = Color.parseColor("#7f7f7f");
 
-        PieDataSet set = new PieDataSet(entries, "Election Results");
-        set.setColors(colorCorrect, colorWrong, colorNotAnswered);
+
+        List<PieEntry> entries = new ArrayList<>();
+        List<Integer> colors = new ArrayList<>();
+
+        if(countCorrent > 0) {
+            entries.add(new PieEntry(countCorrent, "Correct"));
+            colors.add(colorCorrect);
+        }
+        if(countWrong > 0) {
+            entries.add(new PieEntry(countWrong, "Wrong"));
+            colors.add(colorWrong);
+        }
+        if(countNotAnswered > 0) {
+            entries.add(new PieEntry(countNotAnswered, "Not Answered"));
+            colors.add(colorNotAnswered);
+        }
+
+
+
+        PieDataSet set = new PieDataSet(entries, "Results");
+        set.setColors(colors);
         set.setValueTextSize(12);
         set.setValueTextColor(Color.WHITE);
         PieData data = new PieData(set);
