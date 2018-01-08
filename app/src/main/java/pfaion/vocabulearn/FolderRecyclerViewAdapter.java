@@ -71,7 +71,7 @@ public class FolderRecyclerViewAdapter extends RecyclerView.Adapter<FolderRecycl
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    mListener.onFolderClick(folder.id);
+                    mListener.onFolderClick(folder);
                 }
             }
         });

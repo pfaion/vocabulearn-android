@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import pfaion.vocabulearn.database.CardSet;
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Folder;
 
@@ -64,13 +66,39 @@ public class FolderFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_folder_list, container, false);
 
+        View allFolders = view.findViewById(R.id.all_folders);
+        allFolders.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onAllFoldersClick();
+            }
+        });
+
+
+        final Button button = view.findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onAllFoldersGraphClick();
+            }
+        });
+        db.getAllSets(new Data.LoadedCb<CardSet[]>() {
+            @Override
+            public void onSuccess(final CardSet[] data) {
+                db.getPercentage(data, new Data.LoadedCb<Integer>() {
+                    @Override
+                    public void onSuccess(Integer data) {
+                        button.setText(data + "%");
+                    }
+                });
+            }
+        });
+
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(adapter);
-        }
+        Context context = view.getContext();
+        RecyclerView recyclerView = view.findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setAdapter(adapter);
         return view;
     }
 
@@ -95,7 +123,9 @@ public class FolderFragment extends Fragment {
 
     public interface OnFolderClickListener {
         // TODO: Update argument type and name
-        void onFolderClick(int id);
+        void onFolderClick(Folder folder);
         void onFolderGraphClick(Folder folder);
+        void onAllFoldersGraphClick();
+        void onAllFoldersClick();
     }
 }

@@ -13,7 +13,7 @@ public interface CardSetDao {
     @Query("SELECT * FROM CardSet")
     public CardSet[] getAllSets();
 
-    @Query("SELECT * FROM CardSet WHERE folder=:folderID")
+    @Query("SELECT * FROM CardSet WHERE folder=:folderID ORDER BY name")
     public CardSet[] getSetsForFolder(int folderID);
 
     @Query("DELETE FROM CardSet")

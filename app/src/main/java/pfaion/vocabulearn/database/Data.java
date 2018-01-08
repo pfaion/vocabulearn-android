@@ -209,6 +209,25 @@ public abstract class Data extends RoomDatabase {
         }
     }
 
+    public void getAllCards(LoadedCb<Flashcard[]> cb) { new GetAllCardsTask(cb).execute(); }
+    private static class GetAllCardsTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<Flashcard[]> cb;
+        private Flashcard[] cards;
+        GetAllCardsTask(LoadedCb<Flashcard[]> cb) { this.cb = cb; }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            cards = sInstance.flashcardDao().getAllCards();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            cb.onSuccess(cards);
+        }
+    }
+
 
 
 
@@ -226,6 +245,28 @@ public abstract class Data extends RoomDatabase {
         @Override
         protected Void doInBackground(Void... params) {
             sets = sInstance.cardSetDao().getSetsForFolder(folderID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            cb.onSuccess(sets);
+        }
+    }
+
+    public void getAllSets(LoadedCb<CardSet[]> cb) {
+        new GetAllSetsTask(cb).execute();
+    }
+
+    private static class GetAllSetsTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<CardSet[]> cb;
+        private CardSet[] sets;
+        GetAllSetsTask(LoadedCb<CardSet[]> cb) { this.cb = cb; }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            sets = sInstance.cardSetDao().getAllSets();
             return null;
         }
 

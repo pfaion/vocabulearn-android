@@ -134,12 +134,12 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 
 
     @Override
-    public void onFolderClick(int id) {
-        Log.d(TAG, "Clicked ID: " + id);
+    public void onFolderClick(Folder folder) {
+        Log.d(TAG, "Clicked ID: " + folder.id);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
-        currentFragment = SetFragment.newInstance(id);
+        currentFragment = SetFragment.newInstance(folder);
         transaction.replace(R.id.frame_layout, currentFragment);
         transaction.addToBackStack("go to folder");
         transaction.commit();
@@ -198,5 +198,69 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
                 dialog.show(getFragmentManager(), "GraphDialog");
             }
         });
+    }
+
+    @Override
+    public void onAllFoldersGraphClick() {
+        db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(Flashcard[] data) {
+                GraphDialogFragment dialog = GraphDialogFragment.newInstance(data, "all folders", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+                dialog.show(getFragmentManager(), "GraphDialog");
+            }
+        });
+    }
+
+    @Override
+    public void onAllFoldersClick() {
+        final Context context = this;
+
+        db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(final Flashcard[] data) {
+                SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
+                    @Override
+                    public void onTransmit(Settings settings) {
+                        Log.d(TAG, "start clicked");
+                        Intent intent = new Intent(context, CardViewActivity.class);
+                        intent.putExtra("cards", data);
+                        intent.putExtra("settings", settings);
+                        startActivity(intent);
+                    }
+                });
+                dialog.show(getFragmentManager(), "SettingsDialog");
+            }
+        });
+    }
+
+    @Override
+    public void onAllSetsClick(Folder folder) {
+        final Context context = this;
+
+        db.getCardsForFolder(folder.id, new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(final Flashcard[] data) {
+                SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
+                    @Override
+                    public void onTransmit(Settings settings) {
+                        Log.d(TAG, "start clicked");
+                        Intent intent = new Intent(context, CardViewActivity.class);
+                        intent.putExtra("cards", data);
+                        intent.putExtra("settings", settings);
+                        startActivity(intent);
+                    }
+                });
+                dialog.show(getFragmentManager(), "SettingsDialog");
+            }
+        });
+    }
+
+    @Override
+    public void onAllSetsGraphClick(Folder folder) {
+        onFolderGraphClick(folder);
     }
 }

@@ -52,7 +52,6 @@ public class SetRecyclerViewAdapter extends RecyclerView.Adapter<SetRecyclerView
         db.getPercentage(new CardSet[]{set}, new Data.LoadedCb<Integer>() {
             @Override
             public void onSuccess(Integer data) {
-                Log.d(TAG, "onSuccess: " + data.toString());
                 holder.mButton.setText(data + "%");
             }
         });
