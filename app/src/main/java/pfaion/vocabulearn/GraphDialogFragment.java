@@ -144,6 +144,7 @@ public class GraphDialogFragment extends DialogFragment {
             dataSet.setFillAlpha(255);
             dataSet.setDrawFilled(true);
             dataSet.setDrawCircles(false);
+            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
             dataSets.add(dataSet);
         }
 
@@ -152,6 +153,7 @@ public class GraphDialogFragment extends DialogFragment {
         for(LineDataSet dataSet : dataSets) {
             lineData.addDataSet(dataSet);
         }
+
 
         lineChart.setData(lineData);
         lineChart.setBackgroundColor(Color.WHITE);
