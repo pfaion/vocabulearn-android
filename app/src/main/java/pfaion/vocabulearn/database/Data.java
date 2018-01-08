@@ -317,6 +317,7 @@ public abstract class Data extends RoomDatabase {
                 } else {
                     Log.d(TAG, "trySendingQueuedResults: " + result.result);
                     Log.d(TAG, "trySendingQueuedResults: INVALID RESPONSE CODE!");
+                    sInstance.resultDao().deleteResults(result);
                     return false;
                 }
             }

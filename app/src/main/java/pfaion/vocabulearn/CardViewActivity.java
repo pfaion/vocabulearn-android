@@ -323,9 +323,9 @@ implements CardFragment.OnFragmentInteractionListener{
             @Override
             public void onSuccess(String data) {
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
-        finish();
     }
 
 
