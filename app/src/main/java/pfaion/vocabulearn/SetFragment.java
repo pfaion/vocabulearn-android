@@ -106,5 +106,6 @@ public class SetFragment extends Fragment {
     public interface OnSetClickListener {
         // TODO: Update argument type and name
         void onSetClick(int id);
+        void onSetGraphClick(CardSet set);
     }
 }

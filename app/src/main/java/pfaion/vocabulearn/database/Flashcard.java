@@ -16,5 +16,6 @@ public class Flashcard implements Serializable {
     public String back;
     public String history;
     public Date created_date;
+    public Date last_trained_date;
     public int card_set;
 }

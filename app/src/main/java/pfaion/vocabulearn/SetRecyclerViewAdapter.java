@@ -60,9 +60,14 @@ public class SetRecyclerViewAdapter extends RecyclerView.Adapter<SetRecyclerView
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mListener) {
-                    mListener.onSetClick(set.id);
-                }
+                mListener.onSetClick(set.id);
+            }
+        });
+
+        holder.mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onSetGraphClick(set);
             }
         });
     }

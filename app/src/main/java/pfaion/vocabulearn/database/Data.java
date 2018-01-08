@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.facebook.stetho.common.StringUtil;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -30,7 +31,7 @@ import okhttp3.Response;
 import pfaion.vocabulearn.CardViewActivity;
 import pfaion.vocabulearn.CardViewActivity.ResultType;
 
-@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 4)
+@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 5)
 @TypeConverters({Converters.class})
 public abstract class Data extends RoomDatabase {
 
@@ -121,9 +122,12 @@ public abstract class Data extends RoomDatabase {
                 }
             }
             if(resultString.length() > 0) {
+                resultString = resultString.substring(0, resultString.length() - 1);
+                resultString += ";" + Math.round(System.currentTimeMillis() / 1000f);
+                Log.d(TAG, "doInBackground: " + resultString);
+
                 sInstance.flashcardDao().updateCards(cards);
 
-                resultString = resultString.substring(0, resultString.length() - 1);
 
                 Result r = new Result();
                 r.result = resultString;
@@ -148,6 +152,8 @@ public abstract class Data extends RoomDatabase {
                 msg = "Results saved!";
 
 
+            } else {
+                msg = "No cards trained.";
             }
 
             return null;
@@ -181,6 +187,28 @@ public abstract class Data extends RoomDatabase {
             cb.onSuccess(cards);
         }
     }
+
+
+    public void getCardsForFolder(int folderID, LoadedCb<Flashcard[]> cb) { new GetCardsForFolderTask(folderID, cb).execute(); }
+    private static class GetCardsForFolderTask extends AsyncTask<Void, Void, Void> {
+
+        private LoadedCb<Flashcard[]> cb;
+        private int folderID;
+        private Flashcard[] cards;
+        GetCardsForFolderTask(int folderID, LoadedCb<Flashcard[]> cb) { this.cb = cb; this.folderID = folderID; }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            cards = sInstance.flashcardDao().getFlashcardsForFolder(folderID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            cb.onSuccess(cards);
+        }
+    }
+
 
 
 
@@ -229,10 +257,11 @@ public abstract class Data extends RoomDatabase {
             for(CardSet set : sets) {
                 Flashcard[] cards = sInstance.flashcardDao().getFlashcardsForSet(set.id);
                 for(Flashcard card : cards) {
-                    if(card.history.length() > 0 && card.history.charAt(0) == '1'){
-                        corrects++;
+                    int minLength = Math.min(5, card.history.length());
+                    for(int i = 0; i < minLength; ++i) {
+                        if(card.history.charAt(i) == '1') corrects++;
                     }
-                    total++;
+                    total += Math.max(1, minLength);
                 }
             }
             percentage = Math.round(100f*corrects/total);

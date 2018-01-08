@@ -47,7 +47,7 @@ public class FolderFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         array = new Folder[0];
-        adapter = new FolderRecyclerViewAdapter(array, mListener);
+        adapter = new FolderRecyclerViewAdapter(array, mListener, getContext());
         db = Data.getInstance(getContext());
 
         db.getAllFolders(new Data.LoadedCb<Folder[]>() {
@@ -96,5 +96,6 @@ public class FolderFragment extends Fragment {
     public interface OnFolderClickListener {
         // TODO: Update argument type and name
         void onFolderClick(int id);
+        void onFolderGraphClick(Folder folder);
     }
 }

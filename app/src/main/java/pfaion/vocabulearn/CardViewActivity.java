@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +14,12 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
@@ -64,22 +71,105 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
         Intent intent = getIntent();
-        if(intent.hasExtra("cards")) {
-            cards = (Flashcard[]) intent.getSerializableExtra("cards");
-            frontFirst = new boolean[cards.length];
-            front = new boolean[cards.length];
-            turnedBefore = new boolean[cards.length];
-            results = new ResultType[cards.length];
-            i = 0;
-            for(int j = 0; j < cards.length; ++j) {
-                frontFirst[j] = true;
-                front[j] = frontFirst[j];
-                turnedBefore[j] = false;
-                results[j] = ResultType.NOT_ANSWERED;
-            }
-            showSlideLeft();
-            updateUI();
+        Settings settings = (Settings) intent.getSerializableExtra("settings");
+        cards = (Flashcard[]) intent.getSerializableExtra("cards");
+
+        switch (settings.order) {
+            case Settings.ORDER_RANDOM:
+                Random rnd = ThreadLocalRandom.current();
+                for (int i = cards.length - 1; i > 0; i--)
+                {
+                    int index = rnd.nextInt(i + 1);
+                    Flashcard a = cards[index];
+                    cards[index] = cards[i];
+                    cards[i] = a;
+                }
+                break;
+            case Settings.ORDER_HARD:
+                Arrays.sort(cards, new Comparator<Flashcard>() {
+                    @Override
+                    public int compare(Flashcard c1, Flashcard c2) {
+                        float performance1 = 0;
+                        float performance2 = 0;
+
+                        int minLength1 = Math.min(5, c1.history.length());
+                        for(int i = 0; i < minLength1; ++i) {
+                            if(c1.history.charAt(i) == '1') performance1++;
+                        }
+                        performance1 /= Math.max(1, minLength1);
+
+                        int minLength2 = Math.min(5, c2.history.length());
+                        for(int i = 0; i < minLength2; ++i) {
+                            if(c2.history.charAt(i) == '1') performance2++;
+                        }
+                        performance2 /= Math.max(1, minLength2);
+
+
+                        return Float.compare(-performance2, -performance1);
+                    }
+                });
+                break;
+            case Settings.ORDER_NEW:
+                Arrays.sort(cards, new Comparator<Flashcard>() {
+                    @Override
+                    public int compare(Flashcard c1, Flashcard c2) {
+                        return Integer.compare(c1.history.length(), c2.history.length());
+                    }
+                });
+                break;
+            case Settings.ORDER_OLD:
+                Arrays.sort(cards, new Comparator<Flashcard>() {
+                    @Override
+                    public int compare(Flashcard c1, Flashcard c2) {
+                        return c1.last_trained_date.compareTo(c2.last_trained_date);
+                    }
+                });
+                break;
+            default:
+                break;
         }
+
+        Log.d(TAG, "onCreate: " + (settings.amount == Settings.AMOUNT_5));
+
+        switch (settings.amount) {
+            case Settings.AMOUNT_5:
+                cards = Arrays.copyOfRange(cards, 0, Math.min(5, cards.length));
+                break;
+            case Settings.AMOUNT_10:
+                cards = Arrays.copyOfRange(cards, 0, Math.min(10, cards.length));
+                break;
+            case Settings.AMOUNT_20:
+                cards = Arrays.copyOfRange(cards, 0, Math.min(20, cards.length));
+                break;
+            case Settings.AMOUNT_30:
+                cards = Arrays.copyOfRange(cards, 0, Math.min(30, cards.length));
+                break;
+            case Settings.AMOUNT_ALL:
+                cards = Arrays.copyOfRange(cards, 0, cards.length);
+                break;
+            default:
+                break;
+        }
+
+
+        frontFirst = new boolean[cards.length];
+        front = new boolean[cards.length];
+        turnedBefore = new boolean[cards.length];
+        results = new ResultType[cards.length];
+        i = 0;
+        for(int j = 0; j < cards.length; ++j) {
+            Random rnd = new Random();
+            if(settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
+            else if(settings.side == Settings.SIDE_BACK_FIRST) frontFirst[j] = false;
+            else if(settings.side == Settings.SIDE_MIXED) frontFirst[j] = rnd.nextBoolean();
+
+
+            front[j] = frontFirst[j];
+            turnedBefore[j] = false;
+            results[j] = ResultType.NOT_ANSWERED;
+        }
+        showSlideLeft();
+        updateUI();
 
 
 
@@ -212,8 +302,8 @@ implements CardFragment.OnFragmentInteractionListener{
                     break;
                 default: break;
             }
-            if(history.length() > 10) {
-                history = history.substring(0, 10);
+            if(history.length() > 16) {
+                history = history.substring(0, 16);
             }
             cards[i].history = history;
         }

@@ -24,8 +24,10 @@ import com.facebook.stetho.Stetho;
 
 import java.util.List;
 
+import pfaion.vocabulearn.database.CardSet;
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
+import pfaion.vocabulearn.database.Folder;
 
 
 public class Overview extends AppCompatActivity
@@ -35,32 +37,41 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     private FrameLayout frameLayout;
 
     private Data db;
+    private Fragment currentFragment = null;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_study:
-                    selectedFragment = FolderFragment.newInstance();
+                    currentFragment = FolderFragment.newInstance();
                     break;
                 case R.id.navigation_folders:
-                    selectedFragment = FolderFragment.newInstance();
+                    currentFragment = FolderFragment.newInstance();
                     break;
                 case R.id.navigation_smart_sets:
-                    selectedFragment = FolderFragment.newInstance();
+                    currentFragment = FolderFragment.newInstance();
                     break;
             }
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.frame_layout, selectedFragment);
+            transaction.replace(R.id.frame_layout, currentFragment);
             transaction.commit();
             return true;
         }
 
     };
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.detach(currentFragment);
+        transaction.attach(currentFragment);
+        transaction.commit();
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -116,7 +127,8 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 //        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_layout, FolderFragment.newInstance());
+        currentFragment = FolderFragment.newInstance();
+        transaction.replace(R.id.frame_layout, currentFragment);
         transaction.commit();
     }
 
@@ -127,7 +139,8 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
-        transaction.replace(R.id.frame_layout, SetFragment.newInstance(id));
+        currentFragment = SetFragment.newInstance(id);
+        transaction.replace(R.id.frame_layout, currentFragment);
         transaction.addToBackStack("go to folder");
         transaction.commit();
 
@@ -141,12 +154,13 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
         db.getCardsForSet(id, new Data.LoadedCb<Flashcard[]>() {
             @Override
             public void onSuccess(final Flashcard[] data) {
-                SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new View.OnClickListener() {
+                SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onTransmit(Settings settings) {
                         Log.d(TAG, "start clicked");
                         Intent intent = new Intent(context, CardViewActivity.class);
                         intent.putExtra("cards", data);
+                        intent.putExtra("settings", settings);
                         startActivity(intent);
                     }
                 });
@@ -154,11 +168,35 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
             }
         });
 
-
-
-
     }
 
+    @Override
+    public void onSetGraphClick(final CardSet set) {
+        db.getCardsForSet(set.id, new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(Flashcard[] data) {
+                GraphDialogFragment dialog = GraphDialogFragment.newInstance(data, set.name, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+                dialog.show(getFragmentManager(), "GraphDialog");
+            }
+        });
+    }
 
-
+    @Override
+    public void onFolderGraphClick(final Folder folder) {
+        db.getCardsForFolder(folder.id, new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(Flashcard[] data) {
+                GraphDialogFragment dialog = GraphDialogFragment.newInstance(data, folder.name, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+                dialog.show(getFragmentManager(), "GraphDialog");
+            }
+        });
+    }
 }
