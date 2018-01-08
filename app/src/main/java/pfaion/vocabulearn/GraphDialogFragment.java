@@ -68,13 +68,7 @@ public class GraphDialogFragment extends DialogFragment {
 
         Flashcard[] cards = (Flashcard[]) getArguments().getSerializable("cards");
 
-        int[][] data = new int[5][10];
-
-        int NOT_DONE = 4;
-        int NEVER = 3;
-        int SOMETIMES = 2;
-        int MOSTLY = 1;
-        int ALWAYS = 0;
+        int[][] data = new int[7][10];
 
         for(Flashcard card : cards) {
             String h = card.history + "                ";
@@ -89,16 +83,21 @@ public class GraphDialogFragment extends DialogFragment {
                         wrong++;
                     }
                 }
+                float total = correct + wrong;
                 if(correct == 0 && wrong == 0) {
-                    data[NOT_DONE][i]++;
-                } else if(correct == 0) {
-                    data[NEVER][i]++;
-                } else if(wrong == 0) {
-                    data[ALWAYS][i]++;
-                } else if(correct < wrong) {
-                    data[SOMETIMES][i]++;
-                } else {
-                    data[MOSTLY][i]++;
+                    data[6][i]++;
+                } else if(correct/total < 1f/5) {
+                    data[5][i]++;
+                } else if(correct/total < 2f/5) {
+                    data[4][i]++;
+                } else if(correct/total < 3f/5) {
+                    data[3][i]++;
+                } else if(correct/total < 4f/5) {
+                    data[2][i]++;
+                } else if(correct/total < 5f/5) {
+                    data[1][i]++;
+                } else if(correct/total == 1f) {
+                    data[0][i]++;
                 }
             }
         }
@@ -106,7 +105,7 @@ public class GraphDialogFragment extends DialogFragment {
         List<List<Entry>> allEntries = new ArrayList<>();
         for(int t = 9; t >= 0; --t) {
             float cumPercent = 0;
-            for (int cat = 0; cat < 5; ++cat) {
+            for (int cat = 0; cat < 7; ++cat) {
                 if(t == 9) allEntries.add(new ArrayList<Entry>());
 
                 float percent = 100f * data[cat][t] / cards.length;
@@ -117,17 +116,21 @@ public class GraphDialogFragment extends DialogFragment {
         }
 
         String[] labels = new String[]{
-                "Correct",
-                "> 50%",
-                "< 50%",
-                "Wrong",
-                "No data"
+                "5",
+                "4",
+                "3",
+                "2",
+                "1",
+                "0",
+                "N/A"
         };
 
         int[] colors = new int[] {
                 Color.parseColor("#009900"),
-                Color.parseColor("#88cc00"),
-                Color.parseColor("#ffaa00"),
+                Color.parseColor("#49b800"),
+                Color.parseColor("#abd600"),
+                Color.parseColor("#f5c400"),
+                Color.parseColor("#ff7214"),
                 Color.parseColor("#ff3333"),
                 Color.parseColor("#cccccc")
         };
