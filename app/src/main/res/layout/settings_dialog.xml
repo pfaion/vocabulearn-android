@@ -20,13 +20,13 @@
 
         <RadioButton
             android:id="@+id/rb_amount_5"
-            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_amount_5"/>
 
         <RadioButton
             android:id="@+id/rb_amount_10"
+            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_amount_10"/>
@@ -72,7 +72,6 @@
 
         <RadioButton
             android:id="@+id/rb_side_front"
-            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_side_front"/>
@@ -85,6 +84,7 @@
 
         <RadioButton
             android:id="@+id/rb_side_mixed"
+            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_side_mixed"/>
@@ -110,13 +110,13 @@
 
         <RadioButton
             android:id="@+id/rb_order_order"
-            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_order_order"/>
 
         <RadioButton
             android:id="@+id/rb_order_random"
+            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_order_random"/>
