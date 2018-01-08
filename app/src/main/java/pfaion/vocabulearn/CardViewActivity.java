@@ -11,6 +11,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +58,7 @@ implements CardFragment.OnFragmentInteractionListener{
     private ImageButton buttonWrong;
     private ImageButton buttonFlip;
     private ImageButton buttonCorrect;
+    private LinearLayout buttonRow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ implements CardFragment.OnFragmentInteractionListener{
         buttonWrong = findViewById(R.id.button_wrong);
         buttonFlip = findViewById(R.id.button_flip);
         buttonCorrect = findViewById(R.id.button_correct);
+        buttonRow = findViewById(R.id.linearLayout);
 
 
         Intent intent = getIntent();
@@ -177,7 +180,11 @@ implements CardFragment.OnFragmentInteractionListener{
         final GestureDetector flipButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                flipCard();
+                if(i == cards.length) {
+                    commitResults();
+                } else {
+                    flipCard();
+                }
                 return true;
             }
         });
@@ -233,29 +240,36 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
     private void updateUI() {
-        ((TextView)findViewById(R.id.cardViewTitle)).setText("Card Set " + (i+1) + "/" + cards.length);
-        int progress = Math.round(100f/cards.length*(i+1));
-        ((ProgressBar)findViewById(R.id.cardViewProgress)).setProgress(progress);
-        switch (results[i]) {
-            case NOT_ANSWERED:
-                buttonWrong.setColorFilter(Color.WHITE);
-                buttonCorrect.setColorFilter(Color.WHITE);
-                break;
-            case WRONG:
-                buttonWrong.setColorFilter(Color.RED);
-                buttonCorrect.setColorFilter(Color.WHITE);
-                break;
-            case CORRECT:
-                buttonWrong.setColorFilter(Color.WHITE);
-                buttonCorrect.setColorFilter(Color.GREEN);
-                break;
-        }
-        if(turnedBefore[i] || frontFirst[i] != front[i]) {
-            buttonWrong.setVisibility(View.VISIBLE);
-            buttonCorrect.setVisibility(View.VISIBLE);
-        } else {
+        if(i == cards.length) {
+            ((TextView) findViewById(R.id.cardViewTitle)).setText("Results");
+            ((ProgressBar) findViewById(R.id.cardViewProgress)).setProgress(100);
             buttonWrong.setVisibility(View.INVISIBLE);
             buttonCorrect.setVisibility(View.INVISIBLE);
+        } else {
+            ((TextView) findViewById(R.id.cardViewTitle)).setText("Card Set " + (i + 1) + "/" + cards.length);
+            int progress = Math.round(100f / cards.length * (i + 1));
+            ((ProgressBar) findViewById(R.id.cardViewProgress)).setProgress(progress);
+            switch (results[i]) {
+                case NOT_ANSWERED:
+                    buttonWrong.setColorFilter(Color.WHITE);
+                    buttonCorrect.setColorFilter(Color.WHITE);
+                    break;
+                case WRONG:
+                    buttonWrong.setColorFilter(Color.RED);
+                    buttonCorrect.setColorFilter(Color.WHITE);
+                    break;
+                case CORRECT:
+                    buttonWrong.setColorFilter(Color.WHITE);
+                    buttonCorrect.setColorFilter(Color.GREEN);
+                    break;
+            }
+            if (turnedBefore[i] || frontFirst[i] != front[i]) {
+                buttonWrong.setVisibility(View.VISIBLE);
+                buttonCorrect.setVisibility(View.VISIBLE);
+            } else {
+                buttonWrong.setVisibility(View.INVISIBLE);
+                buttonCorrect.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -264,29 +278,27 @@ implements CardFragment.OnFragmentInteractionListener{
             i++;
             showSlideLeft();
             updateUI();
-        } else {
-            endAndShowResults();
+        } else if(i == cards.length - 1) {
+            i++;
+            showResultsSlideLeft();
+            updateUI();
         }
     }
 
-
-    private void endAndShowResults() {
-        final Context context = this;
-        ResultsDialogFragment dialog = ResultsDialogFragment.newInstance(results, new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                commitResults();
-
-            }
-        });
-        dialog.show(getFragmentManager(), "ResultsDialog");
+    private void prevCard() {
+        if(i > 0) {
+            i--;
+            showSlideRight();
+            updateUI();
+        }
     }
 
 
     @Override
     public void onBackPressed() {
-        endAndShowResults();
+        i = cards.length;
+        showResultsSlideLeft();
+        updateUI();
     }
 
 
@@ -311,19 +323,13 @@ implements CardFragment.OnFragmentInteractionListener{
             @Override
             public void onSuccess(String data) {
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
-                finish();
             }
         });
+        finish();
     }
 
 
-    private void prevCard() {
-        if(i > 0) {
-            i--;
-            showSlideRight();
-            updateUI();
-        }
-    }
+
 
 
     private void flipCard() {
@@ -351,6 +357,18 @@ implements CardFragment.OnFragmentInteractionListener{
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
         transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText()));
+        transaction.commit();
+    }
+
+    private void showResultsSlideLeft() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
+        transaction.replace(R.id.frameLayout, ResultsFragment.newInstance(results, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: RESULTS BUTTON!");
+            }
+        }));
         transaction.commit();
     }
 

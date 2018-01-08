@@ -124,13 +124,22 @@ public abstract class Data extends RoomDatabase {
             if(resultString.length() > 0) {
                 resultString = resultString.substring(0, resultString.length() - 1);
                 resultString += ";" + Math.round(System.currentTimeMillis() / 1000f);
-                Log.d(TAG, "doInBackground: " + resultString);
 
                 sInstance.flashcardDao().updateCards(cards);
 
 
+
+
                 Result r = new Result();
                 r.result = resultString;
+
+
+                if(!trySendingQueuedResults()) {
+                    msg = "Failed to commit previous response. Stored for later. Check network!";
+                    sInstance.resultDao().insert(r);
+                    return null;
+                }
+
 
                 Request request = new Request.Builder()
                         .url("https://vocabulearn.herokuapp.com/API/results/"+ r.result + "/")
@@ -316,6 +325,26 @@ public abstract class Data extends RoomDatabase {
     }
 
 
+    private static boolean trySendingQueuedResults() {
+        Result[] results = sInstance.resultDao().getAllResults();
+        try {
+            for (Result result : results) {
+                Request request = new Request.Builder()
+                        .url("https://vocabulearn.herokuapp.com/API/results/" + result.result + "/")
+                        .build();
+                Response response = okHttp.newCall(request).execute();
+                if (response.code() == 200) {
+                    sInstance.resultDao().deleteResults(result);
+                } else {
+                    Log.d(TAG, "trySendingQueuedResults: INVALID RESPONSE CODE!");
+                    return false;
+                }
+            }
+        }  catch (IOException e) {
+            return false;
+        }
+        return true;
+    }
 
 
 
@@ -341,17 +370,10 @@ public abstract class Data extends RoomDatabase {
             try {
 
                 Result[] results = sInstance.resultDao().getAllResults();
-                for(Result result : results) {
-                    Request request = new Request.Builder()
-                            .url("https://vocabulearn.herokuapp.com/API/results/"+ result.result + "/")
-                            .build();
-                    Response response = okHttp.newCall(request).execute();
-                    if(response.code() == 200) {
-                        sInstance.resultDao().deleteResults(result);
-                    } else {
-                        messages.add("Failed to commit a previous response. Check network!");
-                        return null;
-                    }
+
+                if(!trySendingQueuedResults()) {
+                    messages.add("Failed to commit a previous response. Check network!");
+                    return null;
                 }
 
                 if(results.length != 0) {
