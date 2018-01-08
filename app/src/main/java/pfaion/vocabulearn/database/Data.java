@@ -127,34 +127,13 @@ public abstract class Data extends RoomDatabase {
 
                 sInstance.flashcardDao().updateCards(cards);
 
-
-
-
                 Result r = new Result();
                 r.result = resultString;
+                sInstance.resultDao().insert(r);
 
 
                 if(!trySendingQueuedResults()) {
-                    msg = "Failed to commit previous response. Stored for later. Check network!";
-                    sInstance.resultDao().insert(r);
-                    return null;
-                }
-
-
-                Request request = new Request.Builder()
-                        .url("https://vocabulearn.herokuapp.com/API/results/"+ r.result + "/")
-                        .build();
-                Response response = null;
-                try {
-                    response = okHttp.newCall(request).execute();
-                    if(response.code() != 200) {
-                        msg = "WRONG NETWORK RESPONSE!";
-                        sInstance.resultDao().insert(r);
-                        return null;
-                    }
-                } catch (IOException e) {
-                    msg = "Failed to commit response. Stored for later. Check network!";
-                    sInstance.resultDao().insert(r);
+                    msg = "Failed to commit a response. Stored for later. Check network!";
                     return null;
                 }
 
@@ -336,6 +315,7 @@ public abstract class Data extends RoomDatabase {
                 if (response.code() == 200) {
                     sInstance.resultDao().deleteResults(result);
                 } else {
+                    Log.d(TAG, "trySendingQueuedResults: " + result.result);
                     Log.d(TAG, "trySendingQueuedResults: INVALID RESPONSE CODE!");
                     return false;
                 }
@@ -369,15 +349,9 @@ public abstract class Data extends RoomDatabase {
 
             try {
 
-                Result[] results = sInstance.resultDao().getAllResults();
-
                 if(!trySendingQueuedResults()) {
                     messages.add("Failed to commit a previous response. Check network!");
                     return null;
-                }
-
-                if(results.length != 0) {
-                    messages.add("Committed " + results.length + " previous responses.");
                 }
 
 
