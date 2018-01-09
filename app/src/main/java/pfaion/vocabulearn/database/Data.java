@@ -121,15 +121,18 @@ public abstract class Data extends RoomDatabase {
                     resultString += ",";
                 }
             }
+
             if(resultString.length() > 0) {
                 resultString = resultString.substring(0, resultString.length() - 1);
                 resultString += ";" + Math.round(System.currentTimeMillis() / 1000f);
+
 
                 sInstance.flashcardDao().updateCards(cards);
 
                 Result r = new Result();
                 r.result = resultString;
                 sInstance.resultDao().insert(r);
+
 
 
                 if(!trySendingQueuedResults()) {

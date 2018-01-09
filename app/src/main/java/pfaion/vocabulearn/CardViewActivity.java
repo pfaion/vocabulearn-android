@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.style.TtsSpan;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -24,6 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import pfaion.vocabulearn.database.Data;
 import pfaion.vocabulearn.database.Flashcard;
+import pfaion.vocabulearn.database.Result;
 
 public class CardViewActivity extends AppCompatActivity
 implements CardFragment.OnFragmentInteractionListener{
@@ -44,6 +46,7 @@ implements CardFragment.OnFragmentInteractionListener{
     private boolean[] turnedBefore;
     private ResultType[] results;
     private int i;
+    private Settings settings;
 
 
     private String currentText() {
@@ -74,8 +77,9 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
         Intent intent = getIntent();
-        Settings settings = (Settings) intent.getSerializableExtra("settings");
+        settings = (Settings) intent.getSerializableExtra("settings");
         cards = (Flashcard[]) intent.getSerializableExtra("cards");
+
 
         switch (settings.order) {
             case Settings.ORDER_RANDOM:
@@ -132,7 +136,7 @@ implements CardFragment.OnFragmentInteractionListener{
                 break;
         }
 
-        Log.d(TAG, "onCreate: " + (settings.amount == Settings.AMOUNT_5));
+
 
         switch (settings.amount) {
             case Settings.AMOUNT_5:
@@ -155,13 +159,15 @@ implements CardFragment.OnFragmentInteractionListener{
         }
 
 
+
+
         frontFirst = new boolean[cards.length];
         front = new boolean[cards.length];
         turnedBefore = new boolean[cards.length];
         results = new ResultType[cards.length];
         i = 0;
+        Random rnd = new Random();
         for(int j = 0; j < cards.length; ++j) {
-            Random rnd = new Random();
             if(settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
             else if(settings.side == Settings.SIDE_BACK_FIRST) frontFirst[j] = false;
             else if(settings.side == Settings.SIDE_MIXED) frontFirst[j] = rnd.nextBoolean();
@@ -303,6 +309,8 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
     private void commitResults() {
+
+
         for(int i = 0; i < cards.length; ++i) {
             String history = cards[i].history;
             switch (results[i]) {
@@ -319,6 +327,9 @@ implements CardFragment.OnFragmentInteractionListener{
             }
             cards[i].history = history;
         }
+
+
+
         db.updateCards(cards, results, new Data.LoadedCb<String>() {
             @Override
             public void onSuccess(String data) {

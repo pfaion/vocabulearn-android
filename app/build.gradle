@@ -38,6 +38,7 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.facebook.stetho:stetho-okhttp:1.5.0'
     compile 'com.github.pwittchen:swipe-rx2:0.2.0'
+    compile 'com.jakewharton.timber:timber:4.5.1'
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
     testCompile 'junit:junit:4.12'
 }

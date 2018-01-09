@@ -18,7 +18,7 @@ public interface FlashcardDao {
     public Flashcard[] getFlashcardsForSet(int setID);
 
 
-    @Query("SELECT * FROM Flashcard INNER JOIN CardSet ON CardSet.id=Flashcard.card_set WHERE CardSet.folder=:folderID")
+    @Query("SELECT Flashcard.* FROM Flashcard INNER JOIN CardSet ON CardSet.id=Flashcard.card_set WHERE CardSet.folder=:folderID")
     public Flashcard[] getFlashcardsForFolder(int folderID);
 
     @Query("DELETE FROM Flashcard")

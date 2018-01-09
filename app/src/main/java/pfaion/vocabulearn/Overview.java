@@ -1,5 +1,6 @@
 package pfaion.vocabulearn;
 
+import android.Manifest;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 
+import java.io.File;
 import java.util.List;
 
 import pfaion.vocabulearn.database.CardSet;
@@ -32,6 +34,7 @@ import pfaion.vocabulearn.database.Folder;
 
 public class Overview extends AppCompatActivity
 implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener {
+
     public static final String TAG = "Vocabulearn";
 
     private FrameLayout frameLayout;
@@ -117,6 +120,13 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+
+
+
+
+
         Stetho.initializeWithDefaults(this);
         db = Data.getInstance(this);
 
@@ -124,7 +134,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
 
         frameLayout = (FrameLayout) findViewById(R.id.frame_layout);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-//        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         currentFragment = FolderFragment.newInstance();
@@ -154,6 +164,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
         db.getCardsForSet(id, new Data.LoadedCb<Flashcard[]>() {
             @Override
             public void onSuccess(final Flashcard[] data) {
+
                 SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
                     @Override
                     public void onTransmit(Settings settings) {
@@ -222,6 +233,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
         db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
             @Override
             public void onSuccess(final Flashcard[] data) {
+
                 SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
                     @Override
                     public void onTransmit(Settings settings) {
@@ -244,6 +256,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
         db.getCardsForFolder(folder.id, new Data.LoadedCb<Flashcard[]>() {
             @Override
             public void onSuccess(final Flashcard[] data) {
+
                 SettingsDialogFragment dialog = SettingsDialogFragment.newInstance(new SettingsDialogFragment.SettingsTransmitListener() {
                     @Override
                     public void onTransmit(Settings settings) {
