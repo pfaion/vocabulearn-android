@@ -144,7 +144,7 @@ public class GraphDialogFragment extends DialogFragment {
             dataSet.setFillAlpha(255);
             dataSet.setDrawFilled(true);
             dataSet.setDrawCircles(false);
-            dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+            dataSet.setMode(LineDataSet.Mode.LINEAR);
             dataSets.add(dataSet);
         }
 
