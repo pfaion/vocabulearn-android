@@ -18,4 +18,5 @@ public class Flashcard implements Serializable {
     public Date created_date;
     public Date last_trained_date;
     public int card_set;
+    public boolean front_first;
 }

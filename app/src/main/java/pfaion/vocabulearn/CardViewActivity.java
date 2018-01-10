@@ -171,7 +171,8 @@ implements CardFragment.OnFragmentInteractionListener{
         i = 0;
         Random rnd = new Random();
         for(int j = 0; j < cards.length; ++j) {
-            if(settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
+            if(cards[j].front_first) frontFirst[j] = true;
+            else if(settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
             else if(settings.side == Settings.SIDE_BACK_FIRST) frontFirst[j] = false;
             else if(settings.side == Settings.SIDE_MIXED) frontFirst[j] = rnd.nextBoolean();
 

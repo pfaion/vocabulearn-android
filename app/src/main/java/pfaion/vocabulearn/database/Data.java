@@ -31,7 +31,7 @@ import okhttp3.Response;
 import pfaion.vocabulearn.CardViewActivity;
 import pfaion.vocabulearn.CardViewActivity.ResultType;
 
-@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 5)
+@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 6)
 @TypeConverters({Converters.class})
 public abstract class Data extends RoomDatabase {
 
