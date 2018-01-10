@@ -62,6 +62,7 @@ implements CardFragment.OnFragmentInteractionListener{
     private ImageButton buttonFlip;
     private ImageButton buttonCorrect;
     private LinearLayout buttonRow;
+    private boolean committing;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,8 @@ implements CardFragment.OnFragmentInteractionListener{
         buttonFlip = findViewById(R.id.button_flip);
         buttonCorrect = findViewById(R.id.button_correct);
         buttonRow = findViewById(R.id.linearLayout);
+
+        committing = false;
 
 
         Intent intent = getIntent();
@@ -187,7 +190,10 @@ implements CardFragment.OnFragmentInteractionListener{
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 if(i == cards.length) {
-                    commitResults();
+                    if(!committing) {
+                        committing = true;
+                        commitResults();
+                    }
                 } else {
                     flipCard();
                 }
@@ -309,6 +315,7 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
     private void commitResults() {
+        Log.d(TAG, "commitResults");
 
 
         for(int i = 0; i < cards.length; ++i) {
