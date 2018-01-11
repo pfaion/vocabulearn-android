@@ -32,6 +32,8 @@ import java.util.List;
 import pfaion.vocabulearn.CardViewActivity.ResultType;
 import pfaion.vocabulearn.database.Flashcard;
 
+import static pfaion.vocabulearn.Overview.TAG;
+
 public class GraphDialogFragment extends DialogFragment {
 
 
@@ -68,7 +70,7 @@ public class GraphDialogFragment extends DialogFragment {
 
         Flashcard[] cards = (Flashcard[]) getArguments().getSerializable("cards");
 
-        int[][] data = new int[7][10];
+        int[][] data = new int[12][10];
 
         for(Flashcard card : cards) {
             String h = card.history + "                ";
@@ -83,21 +85,11 @@ public class GraphDialogFragment extends DialogFragment {
                         wrong++;
                     }
                 }
-                float total = correct + wrong;
                 if(correct == 0 && wrong == 0) {
-                    data[6][i]++;
-                } else if(correct/total < 1f/5) {
-                    data[5][i]++;
-                } else if(correct/total < 2f/5) {
-                    data[4][i]++;
-                } else if(correct/total < 3f/5) {
-                    data[3][i]++;
-                } else if(correct/total < 4f/5) {
-                    data[2][i]++;
-                } else if(correct/total < 5f/5) {
-                    data[1][i]++;
-                } else if(correct/total == 1f) {
-                    data[0][i]++;
+                    data[11][i]++;
+                } else {
+                    int score = wrong - correct + 5;
+                    data[score][i]++;
                 }
             }
         }
@@ -105,35 +97,49 @@ public class GraphDialogFragment extends DialogFragment {
         List<List<Entry>> allEntries = new ArrayList<>();
         for(int t = 9; t >= 0; --t) {
             float cumPercent = 0;
-            for (int cat = 0; cat < 7; ++cat) {
+            for (int cat = 0; cat < data.length; ++cat) {
                 if(t == 9) allEntries.add(new ArrayList<Entry>());
 
                 float percent = 100f * data[cat][t] / cards.length;
                 cumPercent += percent;
+                Log.d(TAG, "cat: " + cat + " | %: " + percent);
 
                 allEntries.get(cat).add(new Entry(9 - t, cumPercent));
             }
         }
+        Collections.reverse(allEntries);
 
         String[] labels = new String[]{
-                "5",
-                "4",
-                "3",
-                "2",
-                "1",
+                "N/A",
+                "-5",
+                "-4",
+                "-3",
+                "-2",
+                "-1",
                 "0",
-                "N/A"
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
         };
 
         int[] colors = new int[] {
-                Color.parseColor("#009900"),
-                Color.parseColor("#49b800"),
-                Color.parseColor("#abd600"),
-                Color.parseColor("#f5c400"),
-                Color.parseColor("#ff7214"),
-                Color.parseColor("#ff3333"),
-                Color.parseColor("#cccccc")
+                Color.parseColor("#cccccc"),
+                Color.parseColor("#ff0000"),
+                Color.parseColor("#ff3300"),
+                Color.parseColor("#ff6600"),
+                Color.parseColor("#ff9900"),
+                Color.parseColor("#ffcc00"),
+                Color.parseColor("#ffff00"),
+                Color.parseColor("#b4e000"),
+                Color.parseColor("#74c200"),
+                Color.parseColor("#41a300"),
+                Color.parseColor("#1b8500"),
+                Color.parseColor("#006600"),
         };
+
+
 
         List<LineDataSet> dataSets = new ArrayList<>();
         for(int i = 0; i < allEntries.size(); ++i) {
@@ -148,7 +154,6 @@ public class GraphDialogFragment extends DialogFragment {
             dataSets.add(dataSet);
         }
 
-        Collections.reverse(dataSets);
         LineData lineData = new LineData();
         for(LineDataSet dataSet : dataSets) {
             lineData.addDataSet(dataSet);
