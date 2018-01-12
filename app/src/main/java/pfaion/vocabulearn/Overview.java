@@ -33,7 +33,7 @@ import pfaion.vocabulearn.database.Folder;
 
 
 public class Overview extends AppCompatActivity
-implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener {
+implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener, StudyFragment.OnStudyFragmentInteractionListener {
 
     public static final String TAG = "Vocabulearn";
 
@@ -275,5 +275,10 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener 
     @Override
     public void onAllSetsGraphClick(Folder folder) {
         onFolderGraphClick(folder);
+    }
+
+    @Override
+    public void onSmartStudy() {
+
     }
 }

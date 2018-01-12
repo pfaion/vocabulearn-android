@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -108,9 +109,13 @@ public abstract class Data extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... params) {
+
+            int time = Math.round(System.currentTimeMillis() / 1000f);
+
             String resultString = "";
             for (int i = 0; i < cards.length; i++) {
                 if(results[i] != ResultType.NOT_ANSWERED) {
+                    cards[i].last_trained_date = new Date(time * 1000L);
                     resultString += cards[i].id + ":";
                     if (results[i] == ResultType.CORRECT) {
                         resultString += "1";
@@ -124,7 +129,7 @@ public abstract class Data extends RoomDatabase {
 
             if(resultString.length() > 0) {
                 resultString = resultString.substring(0, resultString.length() - 1);
-                resultString += ";" + Math.round(System.currentTimeMillis() / 1000f);
+                resultString += ";" + time;
 
 
                 sInstance.flashcardDao().updateCards(cards);
