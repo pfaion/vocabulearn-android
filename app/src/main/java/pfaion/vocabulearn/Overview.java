@@ -49,7 +49,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener,
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_study:
-                    currentFragment = FolderFragment.newInstance();
+                    currentFragment = StudyFragment.newInstance();
                     break;
                 case R.id.navigation_folders:
                     currentFragment = FolderFragment.newInstance();
@@ -137,7 +137,7 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener,
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        currentFragment = FolderFragment.newInstance();
+        currentFragment = StudyFragment.newInstance();
         transaction.replace(R.id.frame_layout, currentFragment);
         transaction.commit();
     }
@@ -279,6 +279,20 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener,
 
     @Override
     public void onSmartStudy() {
-
+        final Context context = this;
+        db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
+            @Override
+            public void onSuccess(final Flashcard[] data) {
+                Settings settings = new Settings(
+                        Settings.AMOUNT_10,
+                        Settings.SIDE_MIXED,
+                        Settings.ORDER_SMART
+                        );
+                Intent intent = new Intent(context, CardViewActivity.class);
+                intent.putExtra("cards", data);
+                intent.putExtra("settings", settings);
+                startActivity(intent);
+            }
+        });
     }
 }

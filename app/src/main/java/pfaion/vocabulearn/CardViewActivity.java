@@ -79,22 +79,22 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
 
-    private double getUrgency(Flashcard c) {
-        int correct = 0;
-        int wrong = 0;
-        for(int i = 0; i < 5 && i < c.history.length(); ++i) {
-            if(c.history.charAt(i) == '0') wrong++;
-            else if(c.history.charAt(i) == '1') correct++;
-        }
-        int score;
-        if(wrong == 0 && correct == 0) score = -1;
-        else score = correct - wrong;
-        long delta_time = System.currentTimeMillis() - c.last_trained_date.getTime();
-        double days = delta_time / 86400000.0;
-        double urgency = Math.exp(-0.7*score) * days;
-        return urgency;
-
-    }
+//    private double getUrgency(Flashcard c) {
+//        int correct = 0;
+//        int wrong = 0;
+//        for(int i = 0; i < 5 && i < c.history.length(); ++i) {
+//            if(c.history.charAt(i) == '0') wrong++;
+//            else if(c.history.charAt(i) == '1') correct++;
+//        }
+//        int score;
+//        if(wrong == 0 && correct == 0) score = -1;
+//        else score = correct - wrong;
+//        long delta_time = System.currentTimeMillis() - c.last_trained_date.getTime();
+//        double days = delta_time / 86400000.0;
+//        double urgency = Math.exp(-0.7*score) * days;
+//        return urgency;
+//
+//    }
 
 
     @Override
@@ -145,7 +145,7 @@ implements CardFragment.OnFragmentInteractionListener{
             double sumUrgencies = 0;
             for(int i = 0; i < cards.length; ++i) {
                 indices.add(i);
-                double urgency = getUrgency(cards[i]);
+                double urgency = cards[i].getUrgency();
                 urgencies.add(urgency);
                 sumUrgencies += urgency;
             }
