@@ -87,7 +87,7 @@ implements CardFragment.OnFragmentInteractionListener{
             else if(c.history.charAt(i) == '1') correct++;
         }
         int score;
-        if(wrong == 0 && correct == 0) score = -5;
+        if(wrong == 0 && correct == 0) score = -1;
         else score = correct - wrong;
         long delta_time = System.currentTimeMillis() - c.last_trained_date.getTime();
         double days = delta_time / 86400000.0;
