@@ -103,7 +103,8 @@ implements FolderFragment.OnFolderClickListener, SetFragment.OnSetClickListener,
                             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
                         }
                         FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                        transaction.replace(R.id.frame_layout, FolderFragment.newInstance());
+                        transaction.detach(currentFragment);
+                        transaction.attach(currentFragment);
                         transaction.commit();
                     }
                 });
