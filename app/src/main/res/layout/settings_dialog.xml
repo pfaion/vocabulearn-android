@@ -110,13 +110,13 @@
 
         <RadioButton
             android:id="@+id/rb_order_order"
+            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
-            android:text="@string/rb_order_order"/>
+            android:text="@string/rb_order_smart"/>
 
         <RadioButton
             android:id="@+id/rb_order_random"
-            android:checked="true"
             style="@style/radio_button"
             android:layout_weight="1"
             android:text="@string/rb_order_random"/>

@@ -2,6 +2,7 @@ package pfaion.vocabulearn;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -20,6 +21,7 @@ public class CardFragment extends Fragment {
     public static final String TAG = "Vocabulearn";
 
     private String text;
+    private boolean isLeech;
 
     private OnFragmentInteractionListener mListener;
 
@@ -28,10 +30,11 @@ public class CardFragment extends Fragment {
     public CardFragment() {
     }
 
-    public static CardFragment newInstance(String text) {
+    public static CardFragment newInstance(String text, boolean isLeech) {
         CardFragment fragment = new CardFragment();
         Bundle args = new Bundle();
         args.putString("text", text);
+        args.putBoolean("isLeech", isLeech);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,6 +44,7 @@ public class CardFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             text = getArguments().getString("text");
+            isLeech = getArguments().getBoolean("isLeech");
         }
     }
 
@@ -52,6 +56,9 @@ public class CardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_card, container, false);
 
         TextView textView = view.findViewById(R.id.textView5);
+        if(isLeech) {
+            textView.setTextColor(Color.rgb(200, 0, 0));
+        }
         textView.setText(text);
 
 

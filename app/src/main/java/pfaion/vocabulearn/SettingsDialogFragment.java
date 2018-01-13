@@ -53,7 +53,7 @@ public class SettingsDialogFragment extends DialogFragment {
                 int side = Settings.SIDE_FRONT_FIRST;
                 if(((RadioButton)view.findViewById(R.id.rb_side_back)).isChecked()) side = Settings.SIDE_BACK_FIRST;
                 if(((RadioButton)view.findViewById(R.id.rb_side_mixed)).isChecked()) side = Settings.SIDE_MIXED;
-                int order = Settings.ORDER_IN;
+                int order = Settings.ORDER_SMART;
                 if(((RadioButton)view.findViewById(R.id.rb_order_random)).isChecked()) order = Settings.ORDER_RANDOM;
                 if(((RadioButton)view.findViewById(R.id.rb_order_hard)).isChecked()) order = Settings.ORDER_HARD;
                 if(((RadioButton)view.findViewById(R.id.rb_order_old)).isChecked()) order = Settings.ORDER_OLD;

@@ -17,9 +17,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -57,12 +60,42 @@ implements CardFragment.OnFragmentInteractionListener{
         }
     }
 
+    private boolean isLeech() {
+        String history = cards[i].history;
+        int histLength = Math.min(5, history.length());
+        int wrong = 0;
+        for(int i = 0; i < histLength; ++i) {
+            if(history.charAt(i) == '0') wrong++;
+        }
+        return wrong == 5;
+    }
+
 
     private ImageButton buttonWrong;
     private ImageButton buttonFlip;
     private ImageButton buttonCorrect;
     private LinearLayout buttonRow;
     private boolean committing;
+
+
+
+    private double getUrgency(Flashcard c) {
+        int correct = 0;
+        int wrong = 0;
+        for(int i = 0; i < 5 && i < c.history.length(); ++i) {
+            if(c.history.charAt(i) == '0') wrong++;
+            else if(c.history.charAt(i) == '1') correct++;
+        }
+        int score;
+        if(wrong == 0 && correct == 0) score = -5;
+        else score = correct - wrong;
+        long delta_time = System.currentTimeMillis() - c.last_trained_date.getTime();
+        double days = delta_time / 86400000.0;
+        double urgency = Math.exp(-0.7*score) * days;
+        return urgency;
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,11 +117,65 @@ implements CardFragment.OnFragmentInteractionListener{
         cards = (Flashcard[]) intent.getSerializableExtra("cards");
 
 
+        int amount = -1;
+        switch (settings.amount) {
+            case Settings.AMOUNT_5:
+                amount = 5;
+                break;
+            case Settings.AMOUNT_10:
+                amount = 10;
+                break;
+            case Settings.AMOUNT_20:
+                amount = 20;
+                break;
+            case Settings.AMOUNT_30:
+                amount = 30;
+                break;
+            default:
+                break;
+        }
+        int maxAmount = Math.min(amount, cards.length);
+
+
+
+
+        if(settings.order == Settings.ORDER_SMART) {
+            List<Double> urgencies = new ArrayList<>();
+            List<Integer> indices = new ArrayList<>();
+            double sumUrgencies = 0;
+            for(int i = 0; i < cards.length; ++i) {
+                indices.add(i);
+                double urgency = getUrgency(cards[i]);
+                urgencies.add(urgency);
+                sumUrgencies += urgency;
+            }
+            Flashcard[] newCards = new Flashcard[maxAmount];
+            Random rng = new Random();
+            for(int n = 0; n < maxAmount; ++n) {
+                double r = rng.nextDouble() * sumUrgencies;
+                double cumUrgency = 0;
+                for(int i = 0; i < urgencies.size(); ++i) {
+                    cumUrgency += urgencies.get(i);
+                    if(r < cumUrgency || i == urgencies.size() - 1) {
+                        newCards[n] = cards[indices.get(i)];
+                        sumUrgencies -= urgencies.get(i);
+                        urgencies.remove(i);
+                        indices.remove(i);
+                        break;
+                    }
+                }
+            }
+            cards = newCards;
+        }
+
+
+
+
+
         switch (settings.order) {
             case Settings.ORDER_RANDOM:
                 Random rnd = ThreadLocalRandom.current();
-                for (int i = cards.length - 1; i > 0; i--)
-                {
+                for (int i = cards.length - 1; i > 0; i--) {
                     int index = rnd.nextInt(i + 1);
                     Flashcard a = cards[index];
                     cards[index] = cards[i];
@@ -139,26 +226,8 @@ implements CardFragment.OnFragmentInteractionListener{
                 break;
         }
 
-
-
-        switch (settings.amount) {
-            case Settings.AMOUNT_5:
-                cards = Arrays.copyOfRange(cards, 0, Math.min(5, cards.length));
-                break;
-            case Settings.AMOUNT_10:
-                cards = Arrays.copyOfRange(cards, 0, Math.min(10, cards.length));
-                break;
-            case Settings.AMOUNT_20:
-                cards = Arrays.copyOfRange(cards, 0, Math.min(20, cards.length));
-                break;
-            case Settings.AMOUNT_30:
-                cards = Arrays.copyOfRange(cards, 0, Math.min(30, cards.length));
-                break;
-            case Settings.AMOUNT_ALL:
-                cards = Arrays.copyOfRange(cards, 0, cards.length);
-                break;
-            default:
-                break;
+        if(settings.order != Settings.ORDER_SMART && maxAmount > 0) {
+            cards = Arrays.copyOfRange(cards, 0, maxAmount);
         }
 
 
@@ -368,14 +437,14 @@ implements CardFragment.OnFragmentInteractionListener{
                 R.animator.card_flip_right_out,
                 R.animator.card_flip_left_in,
                 R.animator.card_flip_left_out);
-        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText()));
+        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText(), isLeech()));
         transaction.commit();
     }
 
     private void showSlideLeft() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_left, R.animator.slide_out_right, R.animator.slide_in_right, R.animator.slide_out_left);
-        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText()));
+        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText(), isLeech()));
         transaction.commit();
     }
 
@@ -394,7 +463,7 @@ implements CardFragment.OnFragmentInteractionListener{
     private void showSlideRight() {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.animator.slide_in_right, R.animator.slide_out_left, R.animator.slide_in_left, R.animator.slide_out_right);
-        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText()));
+        transaction.replace(R.id.frameLayout, CardFragment.newInstance(currentText(), isLeech()));
         transaction.commit();
     }
 

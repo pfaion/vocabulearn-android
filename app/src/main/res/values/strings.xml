@@ -15,7 +15,7 @@
     <string name="rb_side_front">Front First</string>
     <string name="rb_side_back">Back First</string>
     <string name="rb_side_mixed">Mixed</string>
-    <string name="rb_order_order">Order</string>
+    <string name="rb_order_smart">Smart</string>
     <string name="rb_order_random">Random</string>
     <string name="rb_order_hard">Hard</string>
     <string name="rb_order_old">Old</string>
