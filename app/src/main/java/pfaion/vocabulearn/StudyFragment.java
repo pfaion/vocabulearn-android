@@ -174,10 +174,10 @@ public class StudyFragment extends Fragment {
                 lineChart.setDescription(d);
                 lineChart.getLegend().setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
                 lineChart.getAxisLeft().setTextColor(Color.RED);
-                lineChart.getAxisLeft().setDrawGridLines(true);
+                lineChart.getAxisLeft().setDrawGridLines(false);
                 lineChart.getAxisRight().setTextColor(green);
                 lineChart.getAxisLeft().setAxisMinimum(0);
-                lineChart.getAxisRight().setDrawGridLines(false);
+                lineChart.getAxisRight().setDrawGridLines(true);
                 lineChart.getAxisRight().setAxisMinimum(0);
                 lineChart.getXAxis().setEnabled(false);
                 lineChart.invalidate();
@@ -207,7 +207,9 @@ public class StudyFragment extends Fragment {
 
 
                 String t = "Overall score: " + percentage + "%\n" +
+                        "Max urgency: " + new DecimalFormat("##.##").format(max) + "\n" +
                         "Most dustiest card: " + new DecimalFormat("##.##").format(maxDays) + " days\n" +
+                        "Cards : " + cards.length + "\n" +
                         "Cards not seen yet: " + notTrained + "\n" +
                         "Trained in last 24h: " + cardsIn24;
 
