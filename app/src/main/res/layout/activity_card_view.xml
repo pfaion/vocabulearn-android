@@ -14,7 +14,7 @@
         android:layout_height="56dp"
         android:background="@color/primaryDarkColor"
         android:gravity="center"
-        android:text="Adjectives 25/100"
+        android:text="Card Set 25/100"
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -97,5 +97,16 @@
         app:layout_constraintTop_toBottomOf="@+id/cardViewProgress">
 
     </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/button_mark"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:backgroundTint="@color/primaryDarkColor"
+        android:tint="@color/primaryColor"
+        app:layout_constraintBottom_toTopOf="@+id/cardViewProgress"
+        app:layout_constraintEnd_toEndOf="@+id/cardViewTitle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_warning_black_24dp" />
 
 </android.support.constraint.ConstraintLayout>

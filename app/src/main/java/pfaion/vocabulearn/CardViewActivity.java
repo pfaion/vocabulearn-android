@@ -74,27 +74,11 @@ implements CardFragment.OnFragmentInteractionListener{
     private ImageButton buttonWrong;
     private ImageButton buttonFlip;
     private ImageButton buttonCorrect;
+    private ImageButton buttonMarked;
     private LinearLayout buttonRow;
     private boolean committing;
 
 
-
-//    private double getUrgency(Flashcard c) {
-//        int correct = 0;
-//        int wrong = 0;
-//        for(int i = 0; i < 5 && i < c.history.length(); ++i) {
-//            if(c.history.charAt(i) == '0') wrong++;
-//            else if(c.history.charAt(i) == '1') correct++;
-//        }
-//        int score;
-//        if(wrong == 0 && correct == 0) score = -1;
-//        else score = correct - wrong;
-//        long delta_time = System.currentTimeMillis() - c.last_trained_date.getTime();
-//        double days = delta_time / 86400000.0;
-//        double urgency = Math.exp(-0.7*score) * days;
-//        return urgency;
-//
-//    }
 
 
     @Override
@@ -107,6 +91,7 @@ implements CardFragment.OnFragmentInteractionListener{
         buttonWrong = findViewById(R.id.button_wrong);
         buttonFlip = findViewById(R.id.button_flip);
         buttonCorrect = findViewById(R.id.button_correct);
+        buttonMarked = findViewById(R.id.button_mark);
         buttonRow = findViewById(R.id.linearLayout);
 
         committing = false;
@@ -314,6 +299,23 @@ implements CardFragment.OnFragmentInteractionListener{
             }
         });
 
+        final GestureDetector markedButtonGestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                cards[i].marked = !cards[i].marked;
+                updateUI();
+                return true;
+            }
+        });
+        buttonMarked.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                markedButtonGestureDetector.onTouchEvent(motionEvent);
+                return true;
+            }
+        });
+
+
 
 
     }
@@ -327,6 +329,8 @@ implements CardFragment.OnFragmentInteractionListener{
             ((ProgressBar) findViewById(R.id.cardViewProgress)).setProgress(100);
             buttonWrong.setVisibility(View.INVISIBLE);
             buttonCorrect.setVisibility(View.INVISIBLE);
+            buttonMarked.setVisibility(View.INVISIBLE);
+
         } else {
             ((TextView) findViewById(R.id.cardViewTitle)).setText("Card Set " + (i + 1) + "/" + cards.length);
             int progress = Math.round(100f / cards.length * (i + 1));
@@ -351,6 +355,11 @@ implements CardFragment.OnFragmentInteractionListener{
             } else {
                 buttonWrong.setVisibility(View.INVISIBLE);
                 buttonCorrect.setVisibility(View.INVISIBLE);
+            }
+            if(cards[i].marked) {
+                buttonMarked.setColorFilter(Color.RED);
+            } else {
+                buttonMarked.setColorFilter(getResources().getColor(R.color.primaryColor, null));
             }
         }
     }

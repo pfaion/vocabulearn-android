@@ -32,7 +32,7 @@ import okhttp3.Response;
 import pfaion.vocabulearn.CardViewActivity;
 import pfaion.vocabulearn.CardViewActivity.ResultType;
 
-@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 6)
+@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 7)
 @TypeConverters({Converters.class})
 public abstract class Data extends RoomDatabase {
 
@@ -113,7 +113,9 @@ public abstract class Data extends RoomDatabase {
             int time = Math.round(System.currentTimeMillis() / 1000f);
 
             String resultString = "";
+            String markedString = "";
             for (int i = 0; i < cards.length; i++) {
+                if(cards[i].marked) markedString += cards[i].id + ",";
                 if(results[i] != ResultType.NOT_ANSWERED) {
                     cards[i].last_trained_date = new Date(time * 1000L);
                     resultString += cards[i].id + ":";
@@ -127,12 +129,13 @@ public abstract class Data extends RoomDatabase {
                 }
             }
 
-            if(resultString.length() > 0) {
-                resultString = resultString.substring(0, resultString.length() - 1);
-                resultString += ";" + time;
+            sInstance.flashcardDao().updateCards(cards);
 
+            if(resultString.length() > 0 || markedString.length() > 0) {
+                if(resultString.length() > 0) resultString = resultString.substring(0, resultString.length() - 1);
+                resultString += ";" + time + ";";
+                if(markedString.length() > 0) resultString += markedString.substring(0, markedString.length() - 1);
 
-                sInstance.flashcardDao().updateCards(cards);
 
                 Result r = new Result();
                 r.result = resultString;

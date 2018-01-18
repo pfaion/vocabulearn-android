@@ -67,6 +67,8 @@ public class StudyFragment extends Fragment {
             @Override
             public void onSuccess(Flashcard[] cards) {
 
+                if(cards.length == 0) return;
+
                 final double[] urgencies = new double[cards.length];
                 final Integer[] scores = new Integer[cards.length];
                 final int[] times = new int[cards.length];
@@ -112,22 +114,6 @@ public class StudyFragment extends Fragment {
                 LineData lineData = new LineData();
                 List<Entry> entries;
                 LineDataSet dataSet;
-
-
-
-
-
-
-
-//                entries = new ArrayList<>();
-//                for(int i = 0; i < scores.length; ++i) {
-//                    entries.add(new Entry(i, scores[i] / 11f * max));
-//                }
-//                dataSet = new LineDataSet(entries, "Score");
-//                dataSet.setDrawCircles(false);
-//                dataSet.setColor(Color.BLUE);
-//
-//                lineData.addDataSet(dataSet);
 
 
 
@@ -192,6 +178,7 @@ public class StudyFragment extends Fragment {
                 int notTrained = 0;
                 double maxDays = 0;
                 int cardsIn24 = 0;
+                int marked = 0;
                 for(Flashcard card : cards) {
                     int minLength = Math.min(5, card.history.length());
                     if(card.history.length() == 0) notTrained++;
@@ -202,6 +189,7 @@ public class StudyFragment extends Fragment {
                     if(days < 1.0) cardsIn24++;
                     if(days > maxDays) maxDays = days;
                     total += 5;
+                    if(card.marked) marked++;
                 }
                 int percentage = Math.round(100f*corrects/total);
 
@@ -211,6 +199,7 @@ public class StudyFragment extends Fragment {
                         "Most dustiest card: " + new DecimalFormat("##.##").format(maxDays) + " days\n" +
                         "Cards : " + cards.length + "\n" +
                         "Cards not seen yet: " + notTrained + "\n" +
+                        "Cards marked: " + marked + "\n" +
                         "Trained in last 24h: " + cardsIn24;
 
                 text.setText(t);

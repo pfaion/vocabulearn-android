@@ -19,6 +19,7 @@ public class Flashcard implements Serializable {
     public Date last_trained_date;
     public int card_set;
     public boolean front_first;
+    public boolean marked = false;
 
     public double getUrgency() {
         int score = getScore();
