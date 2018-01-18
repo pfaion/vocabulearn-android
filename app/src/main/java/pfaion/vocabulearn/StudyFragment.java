@@ -163,6 +163,8 @@ public class StudyFragment extends Fragment {
                 lineChart.getAxisLeft().setDrawGridLines(false);
                 lineChart.getAxisRight().setTextColor(green);
                 lineChart.getAxisLeft().setAxisMinimum(0);
+                lineChart.setExtraLeftOffset(10);
+                lineChart.setExtraRightOffset(10);
                 lineChart.getAxisRight().setDrawGridLines(true);
                 lineChart.getAxisRight().setAxisMinimum(0);
                 lineChart.getXAxis().setEnabled(false);
