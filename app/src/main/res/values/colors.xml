@@ -10,4 +10,16 @@
     <color name="secondaryTextColor">#000000</color>
 
     <color name="black_overlay">#66000000</color>
+
+
+
+
+
+    <color name="material_green_600">#388E3C</color>
+    <color name="material_lightblue_600">#039BE5</color>
+    <color name="material_purple_600">#8E24AA</color>
+    <color name="material_bluegray_600">#546E7A</color>
+    <color name="material_orange_600">#F57C00</color>
+    <color name="material_red_600">#e53935</color>
+    <color name="material_indigo_600">#3949AB</color>
 </resources>

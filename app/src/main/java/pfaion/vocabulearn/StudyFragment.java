@@ -61,7 +61,13 @@ public class StudyFragment extends Fragment {
         db = Data.getInstance(getContext());
 
         final LineChart lineChart = (LineChart)view.findViewById(R.id.chart);
-        final TextView text = (TextView)view.findViewById(R.id.text);
+        final TextView label0 = (TextView)view.findViewById(R.id.label0);
+        final TextView label11 = (TextView)view.findViewById(R.id.label11);
+        final TextView label12 = (TextView)view.findViewById(R.id.label12);
+        final TextView label21 = (TextView)view.findViewById(R.id.label21);
+        final TextView label22 = (TextView)view.findViewById(R.id.label22);
+        final TextView label31 = (TextView)view.findViewById(R.id.label31);
+        final TextView label32 = (TextView)view.findViewById(R.id.label32);
 
         db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
             @Override
@@ -119,17 +125,14 @@ public class StudyFragment extends Fragment {
 
 
 
-                int green = Color.rgb(0, 180, 0);
                 entries = new ArrayList<>();
                 for(int i = 0; i < times.length; ++i) {
                     entries.add(new Entry(i, times[i] / 86400f));
                 }
                 dataSet = new LineDataSet(entries, "Days");
+                int blue = Color.parseColor("#1f77b4");
                 dataSet.setDrawCircles(false);
-                dataSet.setColor(green);
-                dataSet.setDrawFilled(true);
-                dataSet.setFillColor(green);
-                dataSet.setFillAlpha(50);
+                dataSet.setColor(blue);
                 dataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
 
                 lineData.addDataSet(dataSet);
@@ -142,13 +145,29 @@ public class StudyFragment extends Fragment {
                     entries.add(new Entry(i, (float)urgencies[i]));
                 }
                 dataSet = new LineDataSet(entries, "Urgency");
+                int orange = Color.parseColor("#ff7f0e");
                 dataSet.setDrawCircles(false);
-                dataSet.setColor(Color.RED);
+                dataSet.setColor(orange);
                 dataSet.setDrawFilled(true);
-                dataSet.setFillColor(Color.RED);
+                dataSet.setFillColor(orange);
                 dataSet.setFillAlpha(50);
 
                 lineData.addDataSet(dataSet);
+
+
+
+                if(max > 10) {
+                    entries = new ArrayList<>();
+                    entries.add(new Entry(0, 10));
+                    entries.add(new Entry(cards.length - 1, 10));
+                    dataSet = new LineDataSet(entries, "limit");
+                    int red = Color.parseColor("#d62728");
+                    dataSet.setDrawCircles(false);
+                    dataSet.setColor(red);
+                    dataSet.enableDashedLine(10, 10, 0);
+
+                    lineData.addDataSet(dataSet);
+                }
 
 
 
@@ -158,14 +177,12 @@ public class StudyFragment extends Fragment {
                 Description d = new Description();
                 d.setText("");
                 lineChart.setDescription(d);
-                lineChart.getLegend().setPosition(Legend.LegendPosition.BELOW_CHART_CENTER);
-                lineChart.getAxisLeft().setTextColor(Color.RED);
-                lineChart.getAxisLeft().setDrawGridLines(false);
-                lineChart.getAxisRight().setTextColor(green);
+                lineChart.setBackgroundColor(getResources().getColor(R.color.primaryDarkColor, null));
+                lineChart.getLegend().setEnabled(false);
+                lineChart.getAxisLeft().setEnabled(false);
                 lineChart.getAxisLeft().setAxisMinimum(0);
-                lineChart.setExtraLeftOffset(10);
-                lineChart.setExtraRightOffset(10);
-                lineChart.getAxisRight().setDrawGridLines(true);
+                lineChart.getAxisLeft().setAxisMaximum(Math.max(max, 10f));
+                lineChart.getAxisRight().setEnabled(false);
                 lineChart.getAxisRight().setAxisMinimum(0);
                 lineChart.getXAxis().setEnabled(false);
                 lineChart.invalidate();
@@ -196,15 +213,23 @@ public class StudyFragment extends Fragment {
                 int percentage = Math.round(100f*corrects/total);
 
 
-                String t = "Overall score: " + percentage + "%\n" +
-                        "Max urgency: " + new DecimalFormat("##.##").format(max) + "\n" +
-                        "Most dustiest card: " + new DecimalFormat("##.##").format(maxDays) + " days\n" +
-                        "Cards : " + cards.length + "\n" +
-                        "Cards not seen yet: " + notTrained + "\n" +
-                        "Cards marked: " + marked + "\n" +
-                        "Trained in last 24h: " + cardsIn24;
+//                String t = "Overall score: " + percentage + "%\n" +
+//                        "Max urgency: " + new DecimalFormat("##.##").format(max) + "\n" +
+//                        "Most dustiest card: " + new DecimalFormat("##.##").format(maxDays) + " days\n" +
+//                        "Cards : " + cards.length + "\n" +
+//                        "Cards not seen yet: " + notTrained + "\n" +
+//                        "Cards marked: " + marked + "\n" +
+//                        "Trained in last 24h: " + cardsIn24;
+//                text.setText(t);
 
-                text.setText(t);
+                label0.setText("" + percentage + "%");
+                label11.setText("" + cards.length);
+                label12.setText(new DecimalFormat("##.#").format(max));
+                label21.setText("" + notTrained);
+                label22.setText("" + cardsIn24);
+                label31.setText("" + marked);
+                label32.setText("" + (int)maxDays + "d " + Math.round((maxDays - Math.floor(maxDays))*24) + "h");
+
 
             }
         });
