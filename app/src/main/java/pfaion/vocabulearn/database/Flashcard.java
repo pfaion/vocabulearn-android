@@ -22,24 +22,22 @@ public class Flashcard implements Serializable {
     public boolean marked = false;
 
     public double getUrgency() {
-        int score = getScore();
+        double score = getScore();
         long delta_time = getDeltaTimeMillis();
         double days = delta_time / 86400000.0;
-        double urgency = Math.exp(-0.7*score) * days;
+        double urgency = days / Math.pow(1.28, score);
         return urgency;
 
     }
 
-    public int getScore() {
-        int correct = 0;
-        int wrong = 0;
+    public double getScore() {
+        int score = 0;
         for(int i = 0; i < 5 && i < history.length(); ++i) {
-            if(history.charAt(i) == '0') wrong++;
-            else if(history.charAt(i) == '1') correct++;
+            if(history.charAt(i) == '0') score -= (5-i);
+            else if(history.charAt(i) == '1') score += (5-i);
         }
-        int score;
-        if(wrong == 0 && correct == 0) score = -1;
-        else score = correct - wrong;
+
+        if(history.length() == 0) score = -1;
         return score;
     }
 

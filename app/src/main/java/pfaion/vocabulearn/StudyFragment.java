@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Debug;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +78,6 @@ public class StudyFragment extends Fragment {
                 if(cards.length == 0) return;
 
                 final double[] urgencies = new double[cards.length];
-                final Integer[] scores = new Integer[cards.length];
                 final int[] times = new int[cards.length];
                 Integer[] indices = new Integer[cards.length];
 
@@ -86,7 +87,6 @@ public class StudyFragment extends Fragment {
                 for(int i = 0; i < cards.length; ++i) {
                     urgencies[i] = cards[i].getUrgency();
                     if(urgencies[i] > max) max = (float)urgencies[i];
-                    scores[i] = cards[i].getScore() + 5;
                     times[i] = Math.round(cards[i].getDeltaTimeMillis() / 1000f);
                     if(times[i] > maxDelta) maxDelta = times[i];
                     indices[i] = i;
@@ -100,17 +100,14 @@ public class StudyFragment extends Fragment {
                 });
 
                 double[] tmpUrgencies = new double[urgencies.length];
-                Integer[] tmpScores = new Integer[scores.length];
                 int[] tmpTimes = new int[times.length];
                 for(int i = 0; i < indices.length; ++i) {
                     tmpUrgencies[i] = urgencies[indices[i]];
-                    tmpScores[i] = scores[indices[i]];
                     tmpTimes[i] = times[indices[i]];
                 }
 
                 for(int i = 0; i < indices.length; ++i) {
                     urgencies[i] = tmpUrgencies[i];
-                    scores[i] = tmpScores[i];
                     times[i] = tmpTimes[i];
                 }
 

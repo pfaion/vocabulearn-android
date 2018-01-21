@@ -33,20 +33,22 @@ public class Graph {
             String h = card.history + "                ";
             for(int i = 0; i < 10; ++i) {
                 String slice = h.substring(i, i+5);
-                int correct = 0;
-                int wrong = 0;
+                int trials = 0;
+                int score = 0;
                 for(int j = 0; j < 5; ++j) {
-                    if(slice.charAt(j) == '1') {
-                        correct++;
-                    } else if(slice.charAt(j) == '0') {
-                        wrong++;
+                    if(slice.charAt(j) == '0') {
+                        score -= (5-j);
+                        trials++;
+                    } else if(slice.charAt(j) == '1') {
+                        score += (5-j);
+                        trials++;
                     }
                 }
-                if(correct == 0 && wrong == 0) {
+                if(trials == 0) {
                     data[11][i]++;
                 } else {
-                    int score = wrong - correct + 5;
-                    data[score][i]++;
+                    int index = 5 - Math.round(score/3f);
+                    data[index][i]++;
                 }
             }
         }
@@ -59,7 +61,6 @@ public class Graph {
 
                 float percent = 100f * data[cat][t] / cards.length;
                 cumPercent += percent;
-                Log.d(TAG, "cat: " + cat + " | %: " + percent);
 
                 allEntries.get(cat).add(new Entry(9 - t, cumPercent));
             }
@@ -67,18 +68,18 @@ public class Graph {
         Collections.reverse(allEntries);
 
         String[] labels = new String[]{
-                "N/A",
-                "-5",
-                "-4",
-                "-3",
-                "-2",
-                "-1",
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
         };
 
         int[] colors = new int[] {
