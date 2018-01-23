@@ -134,7 +134,7 @@ implements CardFragment.OnFragmentInteractionListener{
                 urgencies.add(cards[i].getUrgency());
                 frontFirstTmp.add(true);
                 sumUrgencies += cards[i].getUrgency();
-                if(cards[i].front_first) {
+                if(!cards[i].front_first) {
                     indices.add(i);
                     urgencies.add(cards[i].getUrgencyBack());
                     frontFirstTmp.add(false);
@@ -157,7 +157,7 @@ implements CardFragment.OnFragmentInteractionListener{
                         sumUrgencies -= urgencies.get(i);
                         urgencies.remove(i);
                         indices.remove(i);
-                        if(card.front_first) {
+                        if(!card.front_first) {
                             int otherSideIdx = indices.indexOf(cardIdx);
                             if(otherSideIdx != -1) {
                                 sumUrgencies -= urgencies.get(otherSideIdx);
