@@ -74,6 +74,7 @@ public class StudyFragment extends Fragment {
         db.getAllCards(new Data.LoadedCb<Flashcard[]>() {
             @Override
             public void onSuccess(Flashcard[] cards) {
+                if(getActivity() == null) return;
 
                 if(cards.length == 0) return;
 
