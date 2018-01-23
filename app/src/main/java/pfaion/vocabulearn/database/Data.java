@@ -32,7 +32,7 @@ import okhttp3.Response;
 import pfaion.vocabulearn.CardViewActivity;
 import pfaion.vocabulearn.CardViewActivity.ResultType;
 
-@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 7)
+@Database(entities = {Folder.class, CardSet.class, Flashcard.class, Result.class}, version = 8)
 @TypeConverters({Converters.class})
 public abstract class Data extends RoomDatabase {
 
@@ -91,8 +91,8 @@ public abstract class Data extends RoomDatabase {
 
 
 
-    public void updateCards(Flashcard[] cards, ResultType[] results, LoadedCb<String> cb) {
-        new UpdateCardsTask(cards, results, cb).execute();
+    public void updateCards(Flashcard[] cards, ResultType[] results, boolean[] frontFirst, LoadedCb<String> cb) {
+        new UpdateCardsTask(cards, results, frontFirst, cb).execute();
     }
 
     private static class UpdateCardsTask extends AsyncTask<Void, Void, Void> {
@@ -100,11 +100,13 @@ public abstract class Data extends RoomDatabase {
         private LoadedCb<String> cb;
         private Flashcard[] cards;
         private ResultType[] results;
+        private boolean[] frontFirst;
         private String msg;
-        UpdateCardsTask(Flashcard[] cards, ResultType[] results, LoadedCb<String> cb) {
+        UpdateCardsTask(Flashcard[] cards, ResultType[] results, boolean[] frontFirst, LoadedCb<String> cb) {
             this.cb = cb;
             this.cards = cards;
             this.results = results;
+            this.frontFirst = frontFirst;
         }
 
         @Override
@@ -112,28 +114,61 @@ public abstract class Data extends RoomDatabase {
 
             int time = Math.round(System.currentTimeMillis() / 1000f);
 
+
+
+
             String resultString = "";
+            String resultStringBack = "";
             String markedString = "";
             for (int i = 0; i < cards.length; i++) {
                 if(cards[i].marked) markedString += cards[i].id + ",";
-                if(results[i] != ResultType.NOT_ANSWERED) {
-                    cards[i].last_trained_date = new Date(time * 1000L);
-                    resultString += cards[i].id + ":";
-                    if (results[i] == ResultType.CORRECT) {
-                        resultString += "1";
+                if(frontFirst[i]) {
+                    if(results[i] != ResultType.NOT_ANSWERED) {
+                        cards[i].last_trained_date = new Date(time * 1000L);
+                        resultString += cards[i].id + ":";
+                        String history = cards[i].history;
+                        if (results[i] == ResultType.CORRECT) {
+                            resultString += "1";
+                            history = "1" + history;
+                        }
+                        if (results[i] == ResultType.WRONG) {
+                            resultString += "0";
+                            history = "0" + history;
+                        }
+                        resultString += ",";
+                        if(history.length() > 16) {
+                            history = history.substring(0, 16);
+                        }
+                        cards[i].history = history;
                     }
-                    if (results[i] == ResultType.WRONG) {
-                        resultString += "0";
+                } else {
+                    if(results[i] != ResultType.NOT_ANSWERED) {
+                        cards[i].last_trained_date_back = new Date(time * 1000L);
+                        resultStringBack += cards[i].id + ":";
+                        String history = cards[i].history_back;
+                        if (results[i] == ResultType.CORRECT) {
+                            resultStringBack += "1";
+                            history = "1" + history;
+                        }
+                        if (results[i] == ResultType.WRONG) {
+                            resultStringBack += "0";
+                            history = "0" + history;
+                        }
+                        resultStringBack += ",";
+                        if(history.length() > 16) {
+                            history = history.substring(0, 16);
+                        }
+                        cards[i].history_back = history;
                     }
-                    resultString += ",";
                 }
             }
 
             sInstance.flashcardDao().updateCards(cards);
 
-            if(resultString.length() > 0 || markedString.length() > 0) {
+            if(resultString.length() > 0 || resultStringBack.length() > 0 || markedString.length() > 0) {
                 if(resultString.length() > 0) resultString = resultString.substring(0, resultString.length() - 1);
-                resultString += ";" + time + ";";
+                if(resultStringBack.length() > 0) resultStringBack = resultStringBack.substring(0, resultStringBack.length() - 1);
+                resultString += ";" + resultStringBack + ";" + time + ";";
                 if(markedString.length() > 0) resultString += markedString.substring(0, markedString.length() - 1);
 
 

@@ -78,20 +78,45 @@ public class StudyFragment extends Fragment {
 
                 if(cards.length == 0) return;
 
-                final double[] urgencies = new double[cards.length];
-                final int[] times = new int[cards.length];
-                Integer[] indices = new Integer[cards.length];
+
+                int n_sides = 0;
+                for(Flashcard card : cards) {
+                    n_sides += (card.front_first) ? 1 : 2;
+                }
+
+
+                final double[] urgencies = new double[n_sides];
+                final boolean[] frontFirst = new boolean[n_sides];
+                final int[] times = new int[n_sides];
+                Integer[] indices = new Integer[n_sides];
 
                 float max = Float.MIN_VALUE;
                 float maxDelta = Float.MIN_VALUE;
 
-                for(int i = 0; i < cards.length; ++i) {
-                    urgencies[i] = cards[i].getUrgency();
-                    if(urgencies[i] > max) max = (float)urgencies[i];
-                    times[i] = Math.round(cards[i].getDeltaTimeMillis() / 1000f);
-                    if(times[i] > maxDelta) maxDelta = times[i];
-                    indices[i] = i;
+
+                int s = 0;
+                for(int c = 0; c < cards.length; ++c) {
+                    frontFirst[s] = true;
+                    indices[s] = c;
+                    urgencies[s] = cards[c].getUrgency();
+                    if (urgencies[s] > max) max = (float) urgencies[s];
+                    Log.d("URGENCY_F", ""+urgencies[s]);
+                    times[s] = Math.round(cards[c].getDeltaTimeMillis() / 1000f);
+                    if (times[s] > maxDelta) maxDelta = times[s];
+                    s++;
+                    if(!cards[c].front_first) {
+                        frontFirst[s] = false;
+                        indices[s] = c;
+                        urgencies[s] = cards[c].getUrgencyBack();
+                        if (urgencies[s] > max) max = (float) urgencies[s];
+                        Log.d("URGENCY_B", ""+urgencies[s]);
+                        times[s] = Math.round(cards[c].getDeltaTimeMillisBack() / 1000f);
+                        if (times[s] > maxDelta) maxDelta = times[s];
+                        s++;
+                    }
                 }
+
+                Log.d("MAX URG", ""+max);
 
                 Arrays.sort(indices, new Comparator<Integer>() {
                     @Override
@@ -101,14 +126,17 @@ public class StudyFragment extends Fragment {
                 });
 
                 double[] tmpUrgencies = new double[urgencies.length];
+                boolean[] tmpFrontFirst = new boolean[frontFirst.length];
                 int[] tmpTimes = new int[times.length];
                 for(int i = 0; i < indices.length; ++i) {
                     tmpUrgencies[i] = urgencies[indices[i]];
+                    tmpFrontFirst[i] = frontFirst[indices[i]];
                     tmpTimes[i] = times[indices[i]];
                 }
 
                 for(int i = 0; i < indices.length; ++i) {
                     urgencies[i] = tmpUrgencies[i];
+                    frontFirst[i] = tmpFrontFirst[i];
                     times[i] = tmpTimes[i];
                 }
 
@@ -118,7 +146,6 @@ public class StudyFragment extends Fragment {
                 LineData lineData = new LineData();
                 List<Entry> entries;
                 LineDataSet dataSet;
-
 
 
 
@@ -196,17 +223,31 @@ public class StudyFragment extends Fragment {
                 double maxDays = 0;
                 int cardsIn24 = 0;
                 int marked = 0;
-                for(Flashcard card : cards) {
-                    int minLength = Math.min(5, card.history.length());
-                    if(card.history.length() == 0) notTrained++;
-                    for(int i = 0; i < minLength; ++i) {
-                        if(card.history.charAt(i) == '1') corrects++;
+                for(int i = 0; i < cards.length; ++i) {
+                    Flashcard card = cards[i];
+                    String history = card.history;
+                    int minLength = Math.min(5, history.length());
+                    if(history.length() == 0) notTrained++;
+                    for(int j = 0; j < minLength; ++j) {
+                        if(history.charAt(j) == '1') corrects++;
                     }
                     double days = card.getDeltaTimeMillis() / 86400000.0;
                     if(days < 1.0) cardsIn24++;
                     if(days > maxDays) maxDays = days;
                     total += 5;
                     if(card.marked) marked++;
+                    if(!card.front_first) {
+                        history = card.history_back;
+                        minLength = Math.min(5, history.length());
+                        if(history.length() == 0) notTrained++;
+                        for(int j = 0; j < minLength; ++j) {
+                            if(history.charAt(j) == '1') corrects++;
+                        }
+                        days = card.getDeltaTimeMillisBack() / 86400000.0;
+                        if(days < 1.0) cardsIn24++;
+                        if(days > maxDays) maxDays = days;
+                        total += 5;
+                    }
                 }
                 int percentage = Math.round(100f*corrects/total);
 

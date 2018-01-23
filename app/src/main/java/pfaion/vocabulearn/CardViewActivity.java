@@ -127,14 +127,22 @@ implements CardFragment.OnFragmentInteractionListener{
         if(settings.order == Settings.ORDER_SMART) {
             List<Double> urgencies = new ArrayList<>();
             List<Integer> indices = new ArrayList<>();
+            List<Boolean> frontFirstTmp = new ArrayList<>();
             double sumUrgencies = 0;
             for(int i = 0; i < cards.length; ++i) {
                 indices.add(i);
-                double urgency = cards[i].getUrgency();
-                urgencies.add(urgency);
-                sumUrgencies += urgency;
+                urgencies.add(cards[i].getUrgency());
+                frontFirstTmp.add(true);
+                sumUrgencies += cards[i].getUrgency();
+                if(cards[i].front_first) {
+                    indices.add(i);
+                    urgencies.add(cards[i].getUrgencyBack());
+                    frontFirstTmp.add(false);
+                    sumUrgencies += cards[i].getUrgencyBack();
+                }
             }
             Flashcard[] newCards = new Flashcard[maxAmount];
+            boolean[] newFrontFirst = new boolean[maxAmount];
             Random rng = new Random();
             for(int n = 0; n < maxAmount; ++n) {
                 double r = rng.nextDouble() * sumUrgencies;
@@ -142,15 +150,27 @@ implements CardFragment.OnFragmentInteractionListener{
                 for(int i = 0; i < urgencies.size(); ++i) {
                     cumUrgency += urgencies.get(i);
                     if(r < cumUrgency || i == urgencies.size() - 1) {
-                        newCards[n] = cards[indices.get(i)];
+                        int cardIdx = indices.get(i);
+                        Flashcard card = cards[cardIdx];
+                        newCards[n] = card;
+                        newFrontFirst[n] = frontFirstTmp.get(i);
                         sumUrgencies -= urgencies.get(i);
                         urgencies.remove(i);
                         indices.remove(i);
+                        if(card.front_first) {
+                            int otherSideIdx = indices.indexOf(cardIdx);
+                            if(otherSideIdx != -1) {
+                                sumUrgencies -= urgencies.get(otherSideIdx);
+                                urgencies.remove(otherSideIdx);
+                                indices.remove(otherSideIdx);
+                            }
+                        }
                         break;
                     }
                 }
             }
             cards = newCards;
+            frontFirst = newFrontFirst;
         }
 
 
@@ -225,10 +245,12 @@ implements CardFragment.OnFragmentInteractionListener{
         i = 0;
         Random rnd = new Random();
         for(int j = 0; j < cards.length; ++j) {
-            if(cards[j].front_first) frontFirst[j] = true;
-            else if(settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
-            else if(settings.side == Settings.SIDE_BACK_FIRST) frontFirst[j] = false;
-            else if(settings.side == Settings.SIDE_MIXED) frontFirst[j] = rnd.nextBoolean();
+            if(settings.order != Settings.ORDER_SMART) {
+                if (cards[j].front_first) frontFirst[j] = true;
+                else if (settings.side == Settings.SIDE_FRONT_FIRST) frontFirst[j] = true;
+                else if (settings.side == Settings.SIDE_BACK_FIRST) frontFirst[j] = false;
+                else if (settings.side == Settings.SIDE_MIXED) frontFirst[j] = rnd.nextBoolean();
+            }
 
 
             front[j] = frontFirst[j];
@@ -267,7 +289,11 @@ implements CardFragment.OnFragmentInteractionListener{
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 ResultType prevResult = results[i];
-                results[i] = ResultType.WRONG;
+                if(prevResult == ResultType.WRONG) {
+                    results[i] = ResultType.NOT_ANSWERED;
+                } else {
+                    results[i] = ResultType.WRONG;
+                }
                 updateUI();
                 if(prevResult == ResultType.NOT_ANSWERED) nextCard();
                 return true;
@@ -285,7 +311,11 @@ implements CardFragment.OnFragmentInteractionListener{
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 ResultType prevResult = results[i];
-                results[i] = ResultType.CORRECT;
+                if(prevResult == ResultType.CORRECT) {
+                    results[i] = ResultType.NOT_ANSWERED;
+                } else {
+                    results[i] = ResultType.CORRECT;
+                }
                 updateUI();
                 if(prevResult == ResultType.NOT_ANSWERED) nextCard();
                 return true;
@@ -397,26 +427,35 @@ implements CardFragment.OnFragmentInteractionListener{
         Log.d(TAG, "commitResults");
 
 
-        for(int i = 0; i < cards.length; ++i) {
-            String history = cards[i].history;
-            switch (results[i]) {
-                case CORRECT:
-                    history = "1" + history;
-                    break;
-                case WRONG:
-                    history = "0" + history;
-                    break;
-                default: break;
-            }
-            if(history.length() > 16) {
-                history = history.substring(0, 16);
-            }
-            cards[i].history = history;
-        }
+//        for(int i = 0; i < cards.length; ++i) {
+//            String history;
+//            if(frontFirst[i]) {
+//                history = cards[i].history;
+//            } else {
+//                history = cards[i].history_back;
+//            }
+//            switch (results[i]) {
+//                case CORRECT:
+//                    history = "1" + history;
+//                    break;
+//                case WRONG:
+//                    history = "0" + history;
+//                    break;
+//                default: break;
+//            }
+//            if(history.length() > 16) {
+//                history = history.substring(0, 16);
+//            }
+//            if(frontFirst[i]) {
+//                cards[i].history = history;
+//            } else {
+//                cards[i].history_back = history;
+//            }
+//        }
+//
 
 
-
-        db.updateCards(cards, results, new Data.LoadedCb<String>() {
+        db.updateCards(cards, results, frontFirst, new Data.LoadedCb<String>() {
             @Override
             public void onSuccess(String data) {
                 Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
