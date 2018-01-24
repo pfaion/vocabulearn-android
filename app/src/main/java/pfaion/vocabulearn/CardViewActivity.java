@@ -122,6 +122,7 @@ implements CardFragment.OnFragmentInteractionListener{
         int maxAmount = Math.min(amount, cards.length);
 
 
+        frontFirst = new boolean[cards.length];
 
 
         if(settings.order == Settings.ORDER_SMART) {
@@ -154,15 +155,19 @@ implements CardFragment.OnFragmentInteractionListener{
                         Flashcard card = cards[cardIdx];
                         newCards[n] = card;
                         newFrontFirst[n] = frontFirstTmp.get(i);
+                        Log.d(TAG, "GOT CARD id: " + card.id + " front: " + newFrontFirst[n]);
                         sumUrgencies -= urgencies.get(i);
                         urgencies.remove(i);
                         indices.remove(i);
+                        frontFirstTmp.remove(i);
                         if(!card.front_first) {
+                            Log.d(TAG, "REMOVE OTHER SIDE");
                             int otherSideIdx = indices.indexOf(cardIdx);
                             if(otherSideIdx != -1) {
                                 sumUrgencies -= urgencies.get(otherSideIdx);
                                 urgencies.remove(otherSideIdx);
                                 indices.remove(otherSideIdx);
+                                frontFirstTmp.remove(otherSideIdx);
                             }
                         }
                         break;
@@ -238,7 +243,6 @@ implements CardFragment.OnFragmentInteractionListener{
 
 
 
-        frontFirst = new boolean[cards.length];
         front = new boolean[cards.length];
         turnedBefore = new boolean[cards.length];
         results = new ResultType[cards.length];

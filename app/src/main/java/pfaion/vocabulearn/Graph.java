@@ -27,10 +27,17 @@ public class Graph {
     public static void fillGraph(LineChart lineChart, Flashcard[] cards) {
 
 
+
+
+
+
+
+
         int[][] data = new int[12][10];
 
         for(Flashcard card : cards) {
             String h = card.history + "                ";
+            String hb = card.history_back + "                ";
             for(int i = 0; i < 10; ++i) {
                 String slice = h.substring(i, i+5);
                 int trials = 0;
@@ -50,6 +57,35 @@ public class Graph {
                     int index = 5 - Math.round(score/3f);
                     data[index][i]++;
                 }
+                if(!card.front_first) {
+                    slice = hb.substring(i, i+5);
+                    trials = 0;
+                    score = 0;
+                    for(int j = 0; j < 5; ++j) {
+                        if(slice.charAt(j) == '0') {
+                            score -= (5-j);
+                            trials++;
+                        } else if(slice.charAt(j) == '1') {
+                            score += (5-j);
+                            trials++;
+                        }
+                    }
+                    if(trials == 0) {
+                        data[11][i]++;
+                    } else {
+                        int index = 5 - Math.round(score/3f);
+                        data[index][i]++;
+                    }
+                }
+            }
+        }
+
+        int n_sides = 0;
+        for(Flashcard card : cards) {
+            if(card.front_first) {
+                n_sides += 1;
+            } else {
+                n_sides += 2;
             }
         }
 
@@ -59,7 +95,7 @@ public class Graph {
             for (int cat = 0; cat < data.length; ++cat) {
                 if(t == 9) allEntries.add(new ArrayList<Entry>());
 
-                float percent = 100f * data[cat][t] / cards.length;
+                float percent = 100f * data[cat][t] / n_sides;
                 cumPercent += percent;
 
                 allEntries.get(cat).add(new Entry(9 - t, cumPercent));

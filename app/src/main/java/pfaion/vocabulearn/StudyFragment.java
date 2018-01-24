@@ -101,6 +101,7 @@ public class StudyFragment extends Fragment {
                     urgencies[s] = cards[c].getUrgency();
                     if (urgencies[s] > max) {
                         max = (float) urgencies[s];
+                        Log.d("MAX URG", "" + max + " id: " + cards[c].id);
                     }
                     times[s] = Math.round(cards[c].getDeltaTimeMillis() / 1000f);
                     if (times[s] > maxDelta) maxDelta = times[s];
@@ -111,6 +112,7 @@ public class StudyFragment extends Fragment {
                         urgencies[s] = cards[c].getUrgencyBack();
                         if (urgencies[s] > max) {
                             max = (float) urgencies[s];
+                            Log.d("MAX URG", "" + max + " id: " + cards[c].id);
                         }
                         times[s] = Math.round(cards[c].getDeltaTimeMillisBack() / 1000f);
                         if (times[s] > maxDelta) maxDelta = times[s];

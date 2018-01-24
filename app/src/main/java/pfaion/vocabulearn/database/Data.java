@@ -336,8 +336,14 @@ public abstract class Data extends RoomDatabase {
                     for(int i = 0; i < minLength; ++i) {
                         if(card.history.charAt(i) == '1') corrects++;
                     }
-//                    total += Math.max(1, minLength);
                     total += 5;
+                    if(!card.front_first) {
+                        minLength = Math.min(5, card.history_back.length());
+                        for(int i = 0; i < minLength; ++i) {
+                            if(card.history_back.charAt(i) == '1') corrects++;
+                        }
+                        total += 5;
+                    }
                 }
             }
             percentage = Math.round(100f*corrects/total);
