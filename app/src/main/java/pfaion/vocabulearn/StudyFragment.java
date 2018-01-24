@@ -97,26 +97,26 @@ public class StudyFragment extends Fragment {
                 int s = 0;
                 for(int c = 0; c < cards.length; ++c) {
                     frontFirst[s] = true;
-                    indices[s] = c;
+                    indices[s] = s;
                     urgencies[s] = cards[c].getUrgency();
-                    if (urgencies[s] > max) max = (float) urgencies[s];
-                    Log.d("URGENCY_F", ""+urgencies[s]);
+                    if (urgencies[s] > max) {
+                        max = (float) urgencies[s];
+                    }
                     times[s] = Math.round(cards[c].getDeltaTimeMillis() / 1000f);
                     if (times[s] > maxDelta) maxDelta = times[s];
                     s++;
                     if(!cards[c].front_first) {
                         frontFirst[s] = false;
-                        indices[s] = c;
+                        indices[s] = s;
                         urgencies[s] = cards[c].getUrgencyBack();
-                        if (urgencies[s] > max) max = (float) urgencies[s];
-                        Log.d("URGENCY_B", ""+urgencies[s]);
+                        if (urgencies[s] > max) {
+                            max = (float) urgencies[s];
+                        }
                         times[s] = Math.round(cards[c].getDeltaTimeMillisBack() / 1000f);
                         if (times[s] > maxDelta) maxDelta = times[s];
                         s++;
                     }
                 }
-
-                Log.d("MAX URG", ""+max);
 
                 Arrays.sort(indices, new Comparator<Integer>() {
                     @Override
@@ -184,7 +184,7 @@ public class StudyFragment extends Fragment {
                 if(max > 10) {
                     entries = new ArrayList<>();
                     entries.add(new Entry(0, 10));
-                    entries.add(new Entry(cards.length - 1, 10));
+                    entries.add(new Entry(urgencies.length - 1, 10));
                     dataSet = new LineDataSet(entries, "limit");
                     int red = Color.parseColor("#d62728");
                     dataSet.setDrawCircles(false);
