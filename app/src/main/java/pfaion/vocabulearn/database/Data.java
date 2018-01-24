@@ -125,6 +125,9 @@ public abstract class Data extends RoomDatabase {
                 if(frontFirst[i]) {
                     if(results[i] != ResultType.NOT_ANSWERED) {
                         cards[i].last_trained_date = new Date(time * 1000L);
+                        if(!cards[i].front_first) {
+                            cards[i].last_trained_date_back = new Date(time * 1000L);
+                        }
                         resultString += cards[i].id + ":";
                         String history = cards[i].history;
                         if (results[i] == ResultType.CORRECT) {
@@ -143,6 +146,7 @@ public abstract class Data extends RoomDatabase {
                     }
                 } else {
                     if(results[i] != ResultType.NOT_ANSWERED) {
+                        cards[i].last_trained_date = new Date(time * 1000L);
                         cards[i].last_trained_date_back = new Date(time * 1000L);
                         resultStringBack += cards[i].id + ":";
                         String history = cards[i].history_back;
