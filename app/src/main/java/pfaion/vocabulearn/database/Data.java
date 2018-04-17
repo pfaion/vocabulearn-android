@@ -338,15 +338,15 @@ public abstract class Data extends RoomDatabase {
                 for(Flashcard card : cards) {
                     int minLength = Math.min(5, card.history.length());
                     for(int i = 0; i < minLength; ++i) {
-                        if(card.history.charAt(i) == '1') corrects++;
+                        if(card.history.charAt(i) == '1') corrects += (5 - i);
                     }
-                    total += 5;
+                    total += 15;
                     if(!card.front_first) {
                         minLength = Math.min(5, card.history_back.length());
                         for(int i = 0; i < minLength; ++i) {
-                            if(card.history_back.charAt(i) == '1') corrects++;
+                            if(card.history_back.charAt(i) == '1') corrects += (5 - i);
                         }
-                        total += 5;
+                        total += 15;
                     }
                 }
             }

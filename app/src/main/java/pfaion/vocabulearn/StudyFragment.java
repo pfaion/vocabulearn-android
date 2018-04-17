@@ -231,24 +231,24 @@ public class StudyFragment extends Fragment {
                     int minLength = Math.min(5, history.length());
                     if(history.length() == 0) notTrained++;
                     for(int j = 0; j < minLength; ++j) {
-                        if(history.charAt(j) == '1') corrects++;
+                        if(history.charAt(j) == '1') corrects += (5 - j);
                     }
                     double days = card.getDeltaTimeMillis() / 86400000.0;
                     if(days < 1.0) cardsIn24++;
                     if(days > maxDays) maxDays = days;
-                    total += 5;
+                    total += 15;
                     if(card.marked) marked++;
                     if(!card.front_first) {
                         history = card.history_back;
                         minLength = Math.min(5, history.length());
                         if(history.length() == 0) notTrained++;
                         for(int j = 0; j < minLength; ++j) {
-                            if(history.charAt(j) == '1') corrects++;
+                            if(history.charAt(j) == '1') corrects += (5 - j);
                         }
                         days = card.getDeltaTimeMillisBack() / 86400000.0;
                         if(days < 1.0) cardsIn24++;
                         if(days > maxDays) maxDays = days;
-                        total += 5;
+                        total += 15;
                     }
                 }
                 int percentage = Math.round(100f*corrects/total);
