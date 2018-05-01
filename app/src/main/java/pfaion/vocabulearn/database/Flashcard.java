@@ -46,7 +46,7 @@ public class Flashcard implements Serializable {
             else if(history.charAt(i) == '1') score += (5-i);
         }
 
-        if(history.length() == 0) score = -1;
+        if(history.length() == 0) score = -5;
         return score;
     }
 
@@ -57,7 +57,7 @@ public class Flashcard implements Serializable {
             else if(history_back.charAt(i) == '1') score += (5-i);
         }
 
-        if(history_back.length() == 0) score = -1;
+        if(history_back.length() == 0) score = -5;
         return score;
     }
 
